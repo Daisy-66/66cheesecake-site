@@ -1,775 +1,207 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>66 Cheesecake 門市庫存盤點系統</title>
   <style>
-    :root {
-      --bg: #fff8ef;
-      --card: #ffffff;
-      --main: #b77935;
-      --main-dark: #7a4b20;
-      --soft: #f4dfc5;
-      --text: #2b2118;
-      --muted: #7b6b5f;
-      --danger: #c2410c;
-      --line: #ead7c2;
-    }
-
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Noto Sans TC", "Segoe UI", sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.6;
-    }
-
-    header {
-      background: linear-gradient(135deg, #fff0da, #f7d7a8);
-      padding: 28px 18px 22px;
-      border-bottom: 1px solid var(--line);
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
-
-    header h1 {
-      margin: 0;
-      font-size: 24px;
-      color: var(--main-dark);
-      line-height: 1.25;
-    }
-
-    header p {
-      margin: 6px 0 0;
-      color: var(--muted);
-      font-size: 14px;
-    }
-
-    main {
-      max-width: 980px;
-      margin: 0 auto;
-      padding: 18px;
-    }
-
-    .card {
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      padding: 18px;
-      margin-bottom: 16px;
-      box-shadow: 0 8px 24px rgba(122, 75, 32, 0.06);
-    }
-
-    .card h2 {
-      margin: 0 0 14px;
-      font-size: 18px;
-      color: var(--main-dark);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
-    }
-
-    .grid-2 {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-    }
-
-    label {
-      display: block;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--muted);
-      margin-bottom: 4px;
-    }
-
-    input, select, textarea {
-      width: 100%;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: 10px 12px;
-      font-size: 16px;
-      background: #fffdfa;
-      color: var(--text);
-      outline: none;
-    }
-
-    input:focus, select:focus, textarea:focus {
-      border-color: var(--main);
-      box-shadow: 0 0 0 3px rgba(183, 121, 53, 0.14);
-    }
-
-    textarea {
-      min-height: 90px;
-      resize: vertical;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 14px;
-    }
-
-    th, td {
-      border-bottom: 1px solid var(--line);
-      padding: 9px 6px;
-      vertical-align: middle;
-    }
-
-    th {
-      text-align: left;
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 700;
-    }
-
-    td input, td select {
-      font-size: 14px;
-      padding: 8px 9px;
-      border-radius: 10px;
-    }
-
-    .item-name {
-      font-weight: 700;
-      color: var(--text);
-      min-width: 86px;
-    }
-
-    .prevQty {
-      font-size: 12px;
-      color: #9a8576;
-      margin-bottom: 2px;
-      display: block;
-    }
-
-    .actions {
-      position: sticky;
-      bottom: 0;
-      background: rgba(255, 248, 239, 0.95);
-      backdrop-filter: blur(8px);
-      padding: 12px 18px 18px;
-      border-top: 1px solid var(--line);
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-      max-width: 980px;
-      margin: 0 auto;
-    }
-
-    button {
-      border: none;
-      border-radius: 14px;
-      padding: 13px 14px;
-      font-size: 15px;
-      font-weight: 800;
-      cursor: pointer;
-    }
-
-    .primary { background: var(--main); color: white; }
-    .secondary { background: var(--soft); color: var(--main-dark); }
-    .danger { background: #fee2d5; color: var(--danger); }
-
-    .output {
-      white-space: pre-wrap;
-      background: #20160f;
-      color: #fff7ed;
-      border-radius: 16px;
-      padding: 16px;
-      font-size: 14px;
-      min-height: 220px;
-      overflow-x: auto;
-    }
-
-    .hint {
-      color: var(--muted);
-      font-size: 13px;
-      margin-top: 8px;
-    }
-
-    .pill {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 999px;
-      background: #fff2dc;
-      color: var(--main-dark);
-      font-size: 12px;
-      margin-left: 4px;
-    }
-
-    @media (max-width: 760px) {
-      header h1 { font-size: 21px; }
-      main { padding: 14px; }
-      .grid, .grid-2 { grid-template-columns: 1fr; }
-      .card { padding: 14px; border-radius: 16px; }
-      table, thead, tbody, th, td, tr { display: block; }
-      thead { display: none; }
-      tr {
-        border: 1px solid var(--line);
-        border-radius: 14px;
-        padding: 10px;
-        margin-bottom: 10px;
-        background: #fffdfa;
-      }
-      td { border: none; padding: 5px 0; }
-      td::before {
-        content: attr(data-label);
-        display: block;
-        font-size: 12px;
-        color: var(--muted);
-        font-weight: 700;
-        margin-bottom: 2px;
-      }
-      .item-name::before { display: none; }
-      .actions {
-        grid-template-columns: 1fr;
-        padding: 10px 14px 14px;
-      }
-    }
+    :root { --bg:#fff8ef; --card:#fff; --main:#b77935; --main-dark:#7a4b20; --soft:#f4dfc5; --text:#2b2118; --muted:#7b6b5f; --danger:#c2410c; --line:#ead7c2; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC","Segoe UI",sans-serif; background:var(--bg); color:var(--text); line-height:1.6; }
+    header { background:linear-gradient(135deg,#fff0da,#f7d7a8); padding:28px 18px 22px; border-bottom:1px solid var(--line); position:sticky; top:0; z-index:10; }
+    header h1 { margin:0; font-size:24px; color:var(--main-dark); line-height:1.25; }
+    header p { margin:6px 0 0; color:var(--muted); font-size:14px; }
+    main { max-width:980px; margin:0 auto; padding:18px; }
+    .card { background:var(--card); border:1px solid var(--line); border-radius:18px; padding:18px; margin-bottom:16px; box-shadow:0 8px 24px rgba(122,75,32,.06); }
+    .card h2 { margin:0 0 14px; font-size:18px; color:var(--main-dark); display:flex; align-items:center; gap:6px; }
+    .grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+    .grid-2 { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
+    label { display:block; font-size:13px; font-weight:700; color:var(--muted); margin-bottom:4px; }
+    input, select, textarea { width:100%; border:1px solid var(--line); border-radius:12px; padding:10px 12px; font-size:16px; background:#fffdfa; color:var(--text); outline:none; }
+    input:focus, select:focus, textarea:focus { border-color:var(--main); box-shadow:0 0 0 3px rgba(183,121,53,.14); }
+    textarea { min-height:90px; resize:vertical; }
+    table { width:100%; border-collapse:collapse; font-size:14px; }
+    th, td { border-bottom:1px solid var(--line); padding:9px 6px; vertical-align:middle; }
+    th { text-align:left; color:var(--muted); font-size:12px; font-weight:800; }
+    td input, td select { font-size:14px; padding:8px 9px; border-radius:10px; }
+    .item-name { font-weight:800; color:var(--text); min-width:86px; }
+    .prevQty { font-size:12px; color:#9a8576; margin-bottom:2px; display:block; }
+    .actions { position:sticky; bottom:0; background:rgba(255,248,239,.95); backdrop-filter:blur(8px); padding:12px 18px 18px; border-top:1px solid var(--line); display:grid; grid-template-columns:repeat(4,1fr); gap:10px; max-width:980px; margin:0 auto; }
+    button { border:none; border-radius:14px; padding:13px 14px; font-size:15px; font-weight:800; cursor:pointer; }
+    .primary { background:var(--main); color:white; }
+    .secondary { background:var(--soft); color:var(--main-dark); }
+    .danger { background:#fee2d5; color:var(--danger); }
+    .output { white-space:pre-wrap; background:#20160f; color:#fff7ed; border-radius:16px; padding:16px; font-size:14px; min-height:220px; overflow-x:auto; }
+    .hint { color:var(--muted); font-size:13px; margin-top:8px; }
+    .pill { display:inline-block; padding:2px 8px; border-radius:999px; background:#fff2dc; color:var(--main-dark); font-size:12px; margin-left:4px; }
+    @media (max-width:760px) { header h1{font-size:21px;} main{padding:14px;} .grid,.grid-2{grid-template-columns:1fr;} .card{padding:14px;border-radius:16px;} table,thead,tbody,th,td,tr{display:block;} thead{display:none;} tr{border:1px solid var(--line); border-radius:14px; padding:10px; margin-bottom:10px; background:#fffdfa;} td{border:none; padding:5px 0;} td::before{content:attr(data-label); display:block; font-size:12px; color:var(--muted); font-weight:800; margin-bottom:2px;} .item-name::before{display:none;} .actions{grid-template-columns:1fr; padding:10px 14px 14px;} }
   </style>
 </head>
 <body>
-  <header>
-    <h1>66 Cheesecake<br>門市庫存盤點系統</h1>
-    <p>每日盤點｜即期管理｜LINE 回報產生器</p>
-  </header>
-
+  <header><h1>66 Cheesecake<br>門市庫存盤點系統</h1><p>每日盤點｜即期管理｜老闆總表版</p></header>
   <main>
     <section class="card">
       <h2>① 基本資料</h2>
       <div class="grid">
-        <div>
-          <label>門市</label>
-          <select id="store" onchange="loadPreviousDayStock()">
-            <option value="板橋大遠百">板橋大遠百</option>
-            <option value="林口三井Outlet">林口三井Outle</option>
-            <option value="高雄漢神巨蛋">高雄漢神巨蛋</option>
-            <option value="臺北大巨蛋">臺北大巨蛋</option>
-          </select>
-        </div>
-        <div>
-          <label>盤點日期</label>
-          <input id="date" type="date" onchange="loadPreviousDayStock()" />
-        </div>
-        <div>
-          <label>盤點時間</label>
-          <input id="time" type="time" />
-        </div>
-        <div>
-          <label>填寫人</label>
-          <input id="staff" placeholder="例如：小美" />
-        </div>
+        <div><label>門市</label><select id="store" onchange="loadPreviousDayStock(); updateRevenueHint();"><option value="板橋大遠百">板橋大遠百</option><option value="林口三井Outlet">林口三井Outlet</option><option value="高雄漢神巨蛋">高雄漢神巨蛋</option><option value="臺北大巨蛋">臺北大巨蛋</option></select></div>
+        <div><label>盤點日期</label><input id="date" type="date" onchange="loadPreviousDayStock(); updateRevenueHint();" /></div>
+        <div><label>盤點時間</label><input id="time" type="time" /></div>
+        <div><label>填寫人</label><input id="staff" placeholder="例如：小美" /></div>
       </div>
-      <p class="hint">選擇日期後，系統會讀取同門市前一天資料，並在「昨日剩餘」每行顯示灰色參考數量。</p>
+      <p class="hint">資料會以「一筆盤點一列」寫入 Google Sheets 的 inventory 總表，老闆可用門市篩選或建立分頁檢視。</p>
     </section>
 
     <section class="card">
       <h2>② 業績填寫</h2>
       <div class="grid-2">
-        <div>
-          <label>當日業績</label>
-          <input id="dailyRevenue" type="number" inputmode="numeric" placeholder="例如：63380" oninput="updateRevenueHint()" />
-        </div>
-        <div>
-          <label>總營業額</label>
-          <input id="totalRevenue" type="number" inputmode="numeric" placeholder="例如：144035" oninput="updateRevenueHint()" />
-        </div>
+        <div><label>當日業績</label><input id="dailyRevenue" type="number" inputmode="numeric" placeholder="例如：63380" oninput="updateRevenueHint()" /></div>
+        <div><label>總營業額</label><input id="totalRevenue" type="number" inputmode="numeric" placeholder="自動計算，可手動修改" oninput="updateRevenueHint(false)" /></div>
       </div>
-      <p class="hint" id="revenueHint">請直接填數字，系統會自動輸出成 $63,380 的格式。</p>
+      <p class="hint" id="revenueHint">請直接填當日業績，系統會抓同門市本月前面日期累計後自動加總。</p>
     </section>
 
-    <section class="card">
-      <h2>③ 賣出顆數 / 份數</h2>
-      <table id="salesTable">
-        <thead><tr><th>品項</th><th>賣出數</th><th>單位</th></tr></thead>
-        <tbody></tbody>
-      </table>
-    </section>
-
-    <section class="card">
-      <h2>④ 昨日剩餘「泡芙、迷你派」數</h2>
-      <button class="secondary" type="button" onclick="loadPreviousDayStock()">顯示前一天數量</button>
-      <p class="hint" id="previousHint">尚未讀取前一天資料。</p>
-      <table id="yesterdayTable">
-        <thead><tr><th>品項</th><th>數量</th><th>箱數 / 備註</th></tr></thead>
-        <tbody></tbody>
-      </table>
-    </section>
-
-    <section class="card">
-      <h2>⑤ 今日烤 / 進貨數</h2>
-      <table id="incomingTable">
-        <thead><tr><th>品項</th><th>數量</th><th>備註</th></tr></thead>
-        <tbody></tbody>
-      </table>
-    </section>
-
-    <section class="card">
-      <h2>⑥ 今日剩餘「泡芙、迷你派」數</h2>
-      <table id="todayTable">
-        <thead><tr><th>品項</th><th>數量</th><th>箱數 / 備註</th></tr></thead>
-        <tbody></tbody>
-      </table>
-    </section>
-
-    <section class="card">
-      <h2>⑦ 效期品庫存 <span class="pill">可填多筆</span></h2>
-      <table id="expiryTable">
-        <thead><tr><th>品項</th><th>效期</th><th>數量</th><th>狀態</th></tr></thead>
-        <tbody></tbody>
-      </table>
-      <button class="secondary" type="button" onclick="addExpiryRow()">＋新增效期品</button>
-      <p class="hint">狀態可選：正常、即期、今日到期、售完。輸出時會自動加上 ⚠️ 或 ❗️。</p>
-    </section>
-
-    <section class="card">
-      <h2>⑧ 備品庫存</h2>
-      <table id="suppliesTable">
-        <thead><tr><th>品項</th><th>前場</th><th>後場 / 箱子</th><th>狀態</th></tr></thead>
-        <tbody></tbody>
-      </table>
-    </section>
-
-    <section class="card">
-      <h2>⑨ 其他備註</h2>
-      <textarea id="notes" placeholder="例如：草莓泡芙做泡芙殼3.5箱、後面大冰箱、異常狀況等"></textarea>
-    </section>
-
-    <section class="card">
-      <h2>LINE 回報文字</h2>
-      <div id="output" class="output">按下「產生回報」後，這裡會出現整理好的盤點文字。</div>
-    </section>
+    <section class="card"><h2>③ 賣出顆數 / 份數</h2><table id="salesTable"><thead><tr><th>品項</th><th>賣出數</th><th>單位</th></tr></thead><tbody></tbody></table></section>
+    <section class="card"><h2>④ 昨日剩餘「泡芙、迷你派」數</h2><button class="secondary" type="button" onclick="loadPreviousDayStock()">顯示前一天數量</button><p class="hint" id="previousHint">尚未讀取前一天資料。</p><table id="yesterdayTable"><thead><tr><th>品項</th><th>數量</th><th>箱數 / 備註</th></tr></thead><tbody></tbody></table></section>
+    <section class="card"><h2>⑤ 今日烤 / 進貨數</h2><table id="incomingTable"><thead><tr><th>品項</th><th>數量</th><th>備註</th></tr></thead><tbody></tbody></table></section>
+    <section class="card"><h2>⑥ 今日剩餘「泡芙、迷你派」數</h2><table id="todayTable"><thead><tr><th>品項</th><th>數量</th><th>箱數 / 備註</th></tr></thead><tbody></tbody></table></section>
+    <section class="card"><h2>⑦ 效期品庫存 <span class="pill">可填多筆</span></h2><table id="expiryTable"><thead><tr><th>品項</th><th>效期</th><th>數量</th><th>狀態</th></tr></thead><tbody></tbody></table><button class="secondary" type="button" onclick="addExpiryRow()">＋新增效期品</button><p class="hint">狀態可選：正常、即期、今日到期、售完。</p></section>
+    <section class="card"><h2>⑧ 備品庫存</h2><table id="suppliesTable"><thead><tr><th>品項</th><th>前場</th><th>後場 / 箱子</th><th>狀態</th></tr></thead><tbody></tbody></table></section>
+    <section class="card"><h2>⑨ 其他備註</h2><textarea id="notes" placeholder="例如：草莓泡芙做泡芙殼3.5箱、後面大冰箱、異常狀況等"></textarea></section>
+    <section class="card"><h2>LINE 回報文字</h2><div id="output" class="output">按下「產生回報」後，這裡會出現整理好的盤點文字。</div></section>
   </main>
 
-  <div class="actions">
-    <button class="primary" onclick="generateReport()">產生回報</button>
-    <button class="secondary" onclick="saveCurrentDay()">儲存本日資料</button>
-    <button class="secondary" onclick="copyReport()">一鍵複製</button>
-    <button class="danger" onclick="clearForm()">清空本日資料</button>
-  </div>
+  <div class="actions"><button class="primary" onclick="generateReport()">產生回報</button><button class="secondary" onclick="saveCurrentDay()">儲存本日資料</button><button class="secondary" onclick="copyReport()">一鍵複製</button><button class="danger" onclick="clearForm()">清空本日資料</button></div>
 
   <script>
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxzOFFJgTdO9YP7UyiB-bsKHtAAk3dvuwjI_ScouqQW-XRN2QaUiWDMYd439uJogv7h/exec";
+    const salesItems = [["焦糖","顆"],["提拉米蘇","顆"],["迷你酥","份"],["卡士達","杯"],["提拉米蘇卡士達","杯"],["巧克力卡士達","杯"]];
+    const stockItems = ["焦糖泡芙",”提拉米蘇泡芙","迷你派"];
+    const incomingItems = ["焦糖泡芙","提拉米蘇泡芙","迷你派","門市烤製"];
+    const expiryDefault = ["蛋糕","布丁","原味卡士達","提拉米蘇卡士達","巧克力卡士達","迷你派原味卡士達”,”泡芙殼”,”曲奇餅乾","丹麥卷原味","丹麥卷咖啡","丹麥卷巧克力","丹麥卷12入鐵盒","起司棒帕馬森","起司棒洋蔥","起司棒草莓"];
+    const supplies = ["迷你派10入盒 黃","迷你派10入盒 粉","迷你派10內襯","泡芙10入盒","提拉米蘇10入盒","草莓10入盒","泡芙30入組裝盒”,”30入內襯
+”,”保冷袋","蛋糕袋","大蛋糕提袋","冰淇淋盒","冰淇淋袋","黃色不織布袋","白色不織布袋","小牙刀","布丁湯匙","保冷劑","POS機卷","未摺蛋糕盒","塑膠杯","蠟燭","防潮糖粉","焦糖粉","可可粉","卡士達杯子 大","卡士達杯子 小","防油分裝紙袋"];
 
-    const salesItems = [
-      ["焦糖", "顆"],
-      ["草莓", "顆"],
-      ["提拉米蘇", "顆"],
-      ["迷你酥", "份"],
-      ["卡士達", "杯"],
-      ["提拉米蘇卡士達", "杯"],
-      ["巧克力卡士達", "杯"],
-    ];
+    function todayISO(){ const d = new Date(); return d.toISOString().slice(0,10); }
+    function nowTime(){ const d = new Date(); return `${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`; }
+    function previousDateISO(dateString){ const d = new Date(dateString + "T00:00:00"); d.setDate(d.getDate()-1); return d.toISOString().slice(0,10); }
+    function weekdayZh(dateString){ const d = new Date(dateString + "T00:00:00"); return ["日","一","二","三","四","五","六"][d.getDay()]; }
+    function formatDate(dateString){ if(!dateString) return ""; const d = new Date(dateString + "T00:00:00"); return `${d.getMonth()+1}/${d.getDate()}（${weekdayZh(dateString)}）`; }
+    function money(value){ if(!value) return ""; const number = Number(value); return Number.isNaN(number) ? value : `$${number.toLocaleString("en-US")}`; }
+    function inputHTML(cls, placeholder=""){ return `<input class="${cls}" placeholder="${placeholder}" />`; }
+    function statusSelect(cls){ return `<select class="${cls}"><option value="正常">正常</option><option value="即期">即期</option><option value="今日到期">今日到期</option><option value="低庫存">低庫存</option><option value="售完">售完</option></select>`; }
+    function rowValue(row, selector){ const el = row.querySelector(selector); return el ? el.value.trim() : ""; }
 
-    const stockItems = ["焦糖泡芙", "草莓泡芙", "提拉米蘇泡芙", "迷你派"];
-    const incomingItems = ["焦糖泡芙", "草莓泡芙", "提拉米蘇泡芙", "迷你派", "門市烤製"];
-    const expiryDefault = ["蛋糕", "布丁", "原味卡士達", "提拉米蘇卡士達", "巧克力卡士達", "草莓卡士達", "迷你派原味卡士達", "曲奇餅乾", "丹麥卷原味", "丹麥卷咖啡", "丹麥卷巧克力", "丹麥卷12入鐵盒", "起司棒帕馬森", "起司棒洋蔥", "起司棒草莓"];
-    const supplies = ["迷你派10入盒 黃", "迷你派10入盒 粉", "迷你派10內襯", "泡芙10入盒", "提拉米蘇10入盒", "草莓10入盒", "泡芙30入組裝盒", "保冷袋", "蛋糕袋", "大蛋糕提袋", "冰淇淋盒", "冰淇淋袋", "黃色不織布袋", "白色不織布袋", "小牙刀", "布丁湯匙", "保冷劑", "POS機卷", "未摺蛋糕盒", "塑膠杯", "蠟燭", "防潮糖粉", "焦糖粉", "可可粉", "卡士達杯子 大", "卡士達杯子 小", "防油分裝紙袋"];
+    function renderSales(){ const tbody = document.querySelector("#salesTable tbody"); tbody.innerHTML = salesItems.map(([name,unit]) => `<tr data-name="${name}" data-unit="${unit}"><td class="item-name" data-label="品項">${name}</td><td data-label="賣出數">${inputHTML("salesQty","0")}</td><td data-label="單位">${unit}</td></tr>`).join(""); }
+    function renderSimpleStock(tableId, items, qtyClass, noteClass, showPrev=false){ const tbody = document.querySelector(`#${tableId} tbody`); tbody.innerHTML = items.map(name => `<tr data-name="${name}"><td class="item-name" data-label="品項">${name}</td><td data-label="數量">${showPrev ? `<span class="prevQty">昨日：-</span>` : ""}${inputHTML(qtyClass,"例如：3308顆 / 78包")}</td><td data-label="箱數 / 備註">${inputHTML(noteClass,"例如：10箱+0.5箱")}</td></tr>`).join(""); }
+    function renderSupplies(){ const tbody = document.querySelector("#suppliesTable tbody"); tbody.innerHTML = supplies.map(name => `<tr data-name="${name}"><td class="item-name" data-label="品項">${name}</td><td data-label="前場">${inputHTML("supplyFront","")}</td><td data-label="後場 / 箱子">${inputHTML("supplyBack","")}</td><td data-label="狀態">${statusSelect("supplyStatus")}</td></tr>`).join(""); }
+    function addExpiryRow(name=""){ const tbody = document.querySelector("#expiryTable tbody"); const tr = document.createElement("tr"); tr.innerHTML = `<td data-label="品項"><input class="expiryName" placeholder="品項" value="${name}" /></td><td data-label="效期"><input class="expiryDate" placeholder="例如：4/26-5/2" /></td><td data-label="數量"><input class="expiryQty" placeholder="例如：4包+3條" /></td><td data-label="狀態">${statusSelect("expiryStatus")}</td>`; tbody.appendChild(tr); }
+    function renderExpiryDefaults(){ expiryDefault.forEach(name => addExpiryRow(name)); }
 
-    function todayISO() {
-      const d = new Date();
-      return d.toISOString().slice(0, 10);
-    }
+    function apiJsonp(action, payload){ return new Promise((resolve,reject)=>{ const callbackName = `jsonp_${Date.now()}_${Math.floor(Math.random()*100000)}`; const params = new URLSearchParams({ action, callback:callbackName, ...payload }); const script = document.createElement("script"); script.src = `${GOOGLE_SCRIPT_URL}?${params.toString()}`; window[callbackName] = data => { delete window[callbackName]; script.remove(); resolve(data); }; script.onerror = () => { delete window[callbackName]; script.remove(); reject(new Error("JSONP request failed")); }; document.body.appendChild(script); }); }
+    async function apiPost(action, payload){ if(action === "getPreviousStock" || action === "getMonthRevenue") return apiJsonp(action, payload); await fetch(GOOGLE_SCRIPT_URL,{ method:"POST", mode:"no-cors", headers:{"Content-Type":"text/plain;charset=utf-8"}, body:JSON.stringify({ action, ...payload }) }); return { ok:true, opaque:true }; }
 
-    function nowTime() {
-      const d = new Date();
-      return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
-    }
+    async function updateRevenueHint(autoCalculate=true){ const store = document.getElementById("store").value; const date = document.getElementById("date").value; const daily = Number(document.getElementById("dailyRevenue").value || 0); const totalInput = document.getElementById("totalRevenue"); let previousTotal = 0; if(autoCalculate && store && date){ try{ const result = await apiPost("getMonthRevenue", { store, date }); if(result && result.ok) previousTotal = Number(result.total || 0); }catch(e){ previousTotal = 0; } if(daily) totalInput.value = previousTotal + daily; }
+      const lines = []; if(daily) lines.push(`當日業績${money(daily)}`); if(totalInput.value) lines.push(`總營業額${money(totalInput.value)}`); document.getElementById("revenueHint").textContent = lines.length ? lines.join("｜") : "請直接填當日業績，系統會自動計算本月累計總營業額。"; }
 
-    function previousDateISO(dateString) {
-      const d = new Date(dateString + "T00:00:00");
-      d.setDate(d.getDate() - 1);
-      return d.toISOString().slice(0, 10);
-    }
+    function sectionFromRows(tableSelector, qtySelector, noteSelector, formatter){ return [...document.querySelectorAll(`${tableSelector} tbody tr`)].map(row => { const name = row.dataset.name || rowValue(row,".expiryName"); const qty = rowValue(row, qtySelector); const note = noteSelector ? rowValue(row,noteSelector) : ""; if(!qty && !note) return ""; return formatter(name, qty, note, row); }).filter(Boolean); }
+    function getRows(tableSelector, qtySelector, noteSelector){ return [...document.querySelectorAll(`${tableSelector} tbody tr`)].map(row => ({ name: row.dataset.name || rowValue(row,".expiryName"), qty: rowValue(row, qtySelector), note: noteSelector ? rowValue(row, noteSelector) : "" })).filter(item => item.name && (item.qty || item.note)); }
+    function getTodayStockRows(){ return getRows("#todayTable", ".todayQty", ".todayNote"); }
+    function stockStorageKey(store,date){ return `inventoryStock:${store}:${date}`; }
+    function saveTodayStockLocal(){ const store = document.getElementById("store").value; const date = document.getElementById("date").value; if(!store || !date) return; localStorage.setItem(stockStorageKey(store,date), JSON.stringify(getTodayStockRows())); }
 
-    function weekdayZh(dateString) {
-      const d = new Date(dateString + "T00:00:00");
-      return ["日", "一", "二", "三", "四", "五", "六"][d.getDay()];
-    }
-
-    function formatDate(dateString) {
-      if (!dateString) return "";
-      const d = new Date(dateString + "T00:00:00");
-      return `${d.getMonth() + 1}/${d.getDate()}（${weekdayZh(dateString)}）`;
-    }
-
-    function money(value) {
-      if (!value) return "";
-      const number = Number(value);
-      if (Number.isNaN(number)) return value;
-      return `$${number.toLocaleString("en-US")}`;
-    }
-
-    function inputHTML(cls, placeholder = "") {
-      return `<input class="${cls}" placeholder="${placeholder}" />`;
-    }
-
-    function statusSelect(cls) {
-      return `<select class="${cls}"><option value="正常">正常</option><option value="即期">即期</option><option value="今日到期">今日到期</option><option value="低庫存">低庫存</option><option value="售完">售完</option></select>`;
-    }
-
-    function rowValue(row, selector) {
-      const el = row.querySelector(selector);
-      return el ? el.value.trim() : "";
-    }
-
-    function renderSales() {
-      const tbody = document.querySelector("#salesTable tbody");
-      tbody.innerHTML = salesItems.map(([name, unit]) => `
-        <tr data-name="${name}" data-unit="${unit}">
-          <td class="item-name" data-label="品項">${name}</td>
-          <td data-label="賣出數">${inputHTML("salesQty", "0")}</td>
-          <td data-label="單位">${unit}</td>
-        </tr>
-      `).join("");
-    }
-
-    function renderSimpleStock(tableId, items, qtyClass, noteClass, showPrev = false) {
-      const tbody = document.querySelector(`#${tableId} tbody`);
-      tbody.innerHTML = items.map(name => `
-        <tr data-name="${name}">
-          <td class="item-name" data-label="品項">${name}</td>
-          <td data-label="數量">
-            ${showPrev ? `<span class="prevQty">昨日：-</span>` : ""}
-            ${inputHTML(qtyClass, "例如：3308顆 / 78包")}
-          </td>
-          <td data-label="箱數 / 備註">${inputHTML(noteClass, "例如：10箱+0.5箱")}</td>
-        </tr>
-      `).join("");
-    }
-
-    function renderSupplies() {
-      const tbody = document.querySelector("#suppliesTable tbody");
-      tbody.innerHTML = supplies.map(name => `
-        <tr data-name="${name}">
-          <td class="item-name" data-label="品項">${name}</td>
-          <td data-label="前場">${inputHTML("supplyFront", "")}</td>
-          <td data-label="後場 / 箱子">${inputHTML("supplyBack", "")}</td>
-          <td data-label="狀態">${statusSelect("supplyStatus")}</td>
-        </tr>
-      `).join("");
-    }
-
-    function addExpiryRow(name = "") {
-      const tbody = document.querySelector("#expiryTable tbody");
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td data-label="品項"><input class="expiryName" placeholder="品項" value="${name}" /></td>
-        <td data-label="效期"><input class="expiryDate" placeholder="例如：4/26-5/2" /></td>
-        <td data-label="數量"><input class="expiryQty" placeholder="例如：4包+3條" /></td>
-        <td data-label="狀態">${statusSelect("expiryStatus")}</td>
-      `;
-      tbody.appendChild(tr);
-    }
-
-    function renderExpiryDefaults() {
-      expiryDefault.forEach(name => addExpiryRow(name));
-    }
-
-    function updateRevenueHint() {
-      const daily = document.getElementById("dailyRevenue").value.trim();
-      const total = document.getElementById("totalRevenue").value.trim();
-      const lines = [];
-      if (daily) lines.push(`當日業績${money(daily)}`);
-      if (total) lines.push(`總營業額${money(total)}`);
-      document.getElementById("revenueHint").textContent = lines.length ? lines.join("｜") : "請直接填數字，系統會自動輸出成 $63,380 的格式。";
-    }
-
-    function sectionFromRows(tableSelector, qtySelector, noteSelector, formatter) {
-      return [...document.querySelectorAll(`${tableSelector} tbody tr`)].map(row => {
-        const name = row.dataset.name || rowValue(row, ".expiryName");
-        const qty = rowValue(row, qtySelector);
-        const note = noteSelector ? rowValue(row, noteSelector) : "";
-        if (!qty && !note) return "";
-        return formatter(name, qty, note, row);
-      }).filter(Boolean);
-    }
-
-    function getTodayStockRows() {
-      return [...document.querySelectorAll("#todayTable tbody tr")].map(row => ({
-        name: row.dataset.name,
-        qty: rowValue(row, ".todayQty"),
-        note: rowValue(row, ".todayNote")
-      })).filter(item => item.qty || item.note);
-    }
-
-    function stockStorageKey(store, date) {
-      return `inventoryStock:${store}:${date}`;
-    }
-
-    function saveTodayStockLocal() {
-      const store = document.getElementById("store").value;
-      const date = document.getElementById("date").value;
-      if (!store || !date) return;
-      localStorage.setItem(stockStorageKey(store, date), JSON.stringify(getTodayStockRows()));
-    }
-
-    function apiJsonp(action, payload) {
-      return new Promise((resolve, reject) => {
-        const callbackName = `jsonp_${Date.now()}_${Math.floor(Math.random() * 100000)}`;
-        const params = new URLSearchParams({ action, callback: callbackName, ...payload });
-        const script = document.createElement("script");
-        script.src = `${GOOGLE_SCRIPT_URL}?${params.toString()}`;
-
-        window[callbackName] = (data) => {
-          delete window[callbackName];
-          script.remove();
-          resolve(data);
-        };
-
-        script.onerror = () => {
-          delete window[callbackName];
-          script.remove();
-          reject(new Error("JSONP request failed"));
-        };
-
-        document.body.appendChild(script);
-      });
-    }
-
-    async function apiPost(action, payload) {
-      if (action === "getPreviousStock") {
-        return apiJsonp("getPreviousStock", payload);
-      }
-
-      await fetch(GOOGLE_SCRIPT_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify({ action, ...payload })
-      });
-
-      return { ok: true, opaque: true };
-    }
-
-    async function loadPreviousDayStock() {
-      const store = document.getElementById("store").value;
-      const date = document.getElementById("date").value;
-      const hint = document.getElementById("previousHint");
-      if (!store || !date) return;
-
-      const prevDate = previousDateISO(date);
-      let previousRows = [];
-      let sourceText = "";
-
-      try {
-        const result = await apiPost("getPreviousStock", { store, date });
-        if (result && result.ok && Array.isArray(result.rows) && result.rows.length) {
-          previousRows = result.rows;
-          sourceText = "Google Sheets";
-        }
-      } catch (error) {
-        console.warn("Google Sheets 讀取失敗，改用本機資料", error);
-      }
-
-      if (!previousRows.length) {
-        const raw = localStorage.getItem(stockStorageKey(store, prevDate));
-        if (raw) {
-          previousRows = JSON.parse(raw);
-          sourceText = "本機瀏覽器";
-        }
-      }
-
+    async function loadPreviousDayStock(){ const store = document.getElementById("store").value; const date = document.getElementById("date").value; const hint = document.getElementById("previousHint"); if(!store || !date) return; const prevDate = previousDateISO(date); let previousRows = []; let sourceText = "";
+      try{ const result = await apiPost("getPreviousStock", { store, date }); if(result && result.ok && Array.isArray(result.rows) && result.rows.length){ previousRows = result.rows; sourceText = "Google Sheets"; } }catch(error){ console.warn("Google Sheets 讀取失敗，改用本機資料", error); }
+      if(!previousRows.length){ const raw = localStorage.getItem(stockStorageKey(store, prevDate)); if(raw){ previousRows = JSON.parse(raw); sourceText = "本機瀏覽器"; } }
       document.querySelectorAll("#yesterdayTable .prevQty").forEach(el => el.textContent = "昨日：-");
+      if(!previousRows.length){ if(hint) hint.textContent = `找不到 ${prevDate} ${store} 的前一天庫存紀錄。`; return; }
+      previousRows.forEach(item => { const row = [...document.querySelectorAll("#yesterdayTable tbody tr")].find(r => r.dataset.name === item.name); if(!row) return; const prevLabel = row.querySelector(".prevQty"); const noteText = item.note ? `（${item.note}）` : ""; if(prevLabel) prevLabel.textContent = `昨日：${item.qty || "-"}${noteText}`; });
+      if(hint) hint.textContent = `已顯示 ${prevDate} ${store} 的前一天數量（來源：${sourceText}）。`;
+    }
 
-      if (!previousRows.length) {
-        if (hint) hint.textContent = `找不到 ${prevDate} ${store} 的前一天庫存紀錄。`;
-        return;
+    function collectSalesRows(){ return [...document.querySelectorAll("#salesTable tbody tr")].map(row => ({ name: row.dataset.name, unit: row.dataset.unit, qty: rowValue(row,".salesQty") })).filter(item => item.qty); }
+    function collectExpiryRows(){ return [...document.querySelectorAll("#expiryTable tbody tr")].map(row => ({ name: rowValue(row,".expiryName"), dateText: rowValue(row,".expiryDate"), qty: rowValue(row,".expiryQty"), status: rowValue(row,".expiryStatus") })).filter(item => item.name && (item.dateText || item.qty || item.status !== "正常")); }
+    function collectSupplyRows(){ return [...document.querySelectorAll("#suppliesTable tbody tr")].map(row => ({ name: row.dataset.name, front: rowValue(row,".supplyFront"), back: rowValue(row,".supplyBack"), status: rowValue(row,".supplyStatus") })).filter(item => item.front || item.back || item.status !== "正常"); }
+
+    function generateReport(){ const store = document.getElementById("store").value; const date = document.getElementById("date").value; const time = document.getElementById("time").value; const staff = document.getElementById("staff").value.trim(); const notes = document.getElementById("notes").value.trim(); const dailyRevenue = document.getElementById("dailyRevenue").value.trim(); const totalRevenue = document.getElementById("totalRevenue").value.trim(); const header = `${formatDate(date)}${time ? time.replace(":","點") : ""}${store}庫存${staff ? `｜填寫：${staff}` : ""}`;
+      const revenueLines = []; if(dailyRevenue) revenueLines.push(`當日業績${money(dailyRevenue)}`); if(totalRevenue) revenueLines.push(`總營業額${money(totalRevenue)}`);
+      const salesLines = collectSalesRows().map(item => `${item.name}賣出${item.qty}${item.unit}`);
+      const yesterdayLines = sectionFromRows("#yesterdayTable", ".yesterdayQty", ".yesterdayNote", (name,qty,note) => `${name}${qty}${note ? `（${note}）` : ""}`);
+      const incomingLines = sectionFromRows("#incomingTable", ".incomingQty", ".incomingNote", (name,qty,note) => `${name}${qty || ""}${note ? `（${note}）` : ""}`);
+      const todayLines = sectionFromRows("#todayTable", ".todayQty", ".todayNote", (name,qty,note) => `${name}${qty}${note ? `（${note}）` : ""}`);
+      const expiryOrder = ["蛋糕","布丁","原味卡士達","提拉米蘇卡士達","巧克力卡士達","迷你派原味卡士達","曲奇餅乾","丹麥卷原味","丹麥卷咖啡","丹麥卷巧克力","丹麥卷12入鐵盒","起司棒帕馬森","起司棒洋蔥","起司棒草莓"];
+      function expiryEndDateValue(dateText){
+        if(!dateText) return 99999999;
+        const targetYear = new Date(document.getElementById("date").value + "T00:00:00").getFullYear();
+        const clean = String(dateText).replaceAll(" ", "");
+        const parts = clean.split("-");
+        const endText = parts[parts.length - 1];
+        const md = endText.split("/");
+        if(md.length < 2) return 99999999;
+        const month = String(md[0]).padStart(2,"0");
+        const day = String(md[1]).padStart(2,"0");
+        return Number(String(targetYear) + month + day);
       }
-
-      previousRows.forEach(item => {
-        const row = [...document.querySelectorAll("#yesterdayTable tbody tr")].find(r => r.dataset.name === item.name);
-        if (!row) return;
-        const prevLabel = row.querySelector(".prevQty");
-        const noteText = item.note ? `（${item.note}）` : "";
-        if (prevLabel) prevLabel.textContent = `昨日：${item.qty || "-"}${noteText}`;
+      const expiryGroups = {};
+      collectExpiryRows().forEach(item => {
+        if(!expiryGroups[item.name]) expiryGroups[item.name] = [];
+        expiryGroups[item.name].push(item);
       });
-
-      if (hint) hint.textContent = `已顯示 ${prevDate} ${store} 的前一天數量（來源：${sourceText}）。`;
-    }
-
-    function generateReport() {
-      const store = document.getElementById("store").value;
-      const date = document.getElementById("date").value;
-      const time = document.getElementById("time").value;
-      const staff = document.getElementById("staff").value.trim();
-      const notes = document.getElementById("notes").value.trim();
-      const dailyRevenue = document.getElementById("dailyRevenue").value.trim();
-      const totalRevenue = document.getElementById("totalRevenue").value.trim();
-
-      const header = `${formatDate(date)}${time ? time.replace(":", "點") : ""}${store}庫存${staff ? `｜填寫：${staff}` : ""}`;
-
-      const revenueLines = [];
-      if (dailyRevenue) revenueLines.push(`當日業績${money(dailyRevenue)}`);
-      if (totalRevenue) revenueLines.push(`總營業額${money(totalRevenue)}`);
-
-      const salesLines = [...document.querySelectorAll("#salesTable tbody tr")].map(row => {
-        const name = row.dataset.name;
-        const unit = row.dataset.unit;
-        const qty = rowValue(row, ".salesQty");
-        return qty ? `${name}賣出${qty}${unit}` : "";
-      }).filter(Boolean);
-
-      const yesterdayLines = sectionFromRows("#yesterdayTable", ".yesterdayQty", ".yesterdayNote", (name, qty, note) => `${name}${qty}${note ? `（${note}）` : ""}`);
-      const incomingLines = sectionFromRows("#incomingTable", ".incomingQty", ".incomingNote", (name, qty, note) => `${name}${qty || ""}${note ? `（${note}）` : ""}`);
-      const todayLines = sectionFromRows("#todayTable", ".todayQty", ".todayNote", (name, qty, note) => `${name}${qty}${note ? `（${note}）` : ""}`);
-
-      const expiryLines = [...document.querySelectorAll("#expiryTable tbody tr")].map(row => {
-        const name = rowValue(row, ".expiryName");
-        const dateText = rowValue(row, ".expiryDate");
-        const qty = rowValue(row, ".expiryQty");
-        const status = rowValue(row, ".expiryStatus");
-        if (!name || (!dateText && !qty && status === "正常")) return "";
-        const mark = status === "今日到期" ? "❗️" : (status === "即期" || status === "低庫存" || status === "售完" ? "⚠️" : "");
-        if (status === "售完") return `${mark}${name} 售完`;
-        return `${name} ${mark}${dateText}${qty ? `*${qty}` : ""}`.trim();
-      }).filter(Boolean);
-
-      const supplyLines = [...document.querySelectorAll("#suppliesTable tbody tr")].map(row => {
-        const name = row.dataset.name;
-        const front = rowValue(row, ".supplyFront");
-        const back = rowValue(row, ".supplyBack");
-        const status = rowValue(row, ".supplyStatus");
-        if (!front && !back && status === "正常") return "";
-        const mark = status === "低庫存" || status === "售完" ? "⚠️" : (status === "即期" || status === "今日到期" ? "❗️" : "");
-        if (status === "售完") return `${mark}${name} 售完`;
-        const parts = [];
-        if (front) parts.push(`前場${front}`);
-        if (back) parts.push(`後場${back}`);
-        return `${mark}${name} ${parts.join("，")}`.trim();
-      }).filter(Boolean);
-
-const blocks = [
-  header,
-  revenueLines.length ? revenueLines.join("\n") : "",
-  salesLines.length ? `\n⭐️賣出顆數：\n${salesLines.join("\n")}` : "",
-  yesterdayLines.length ? `\n⭐️昨日剩餘「泡芙、迷你派」數：\n${yesterdayLines.join("\n")}` : "",
-  incomingLines.length ? `\n⭐️今日烤、進貨「泡芙、迷你派」數：\n${incomingLines.join("\n")}` : "",
-  todayLines.length ? `\n⭐️今日剩餘「泡芙、迷你派」數：\n${todayLines.join("\n")}` : "",
-  expiryLines.length ? `\n⭐️效期品庫存：\n${expiryLines.join("\n")}` : "",
-  supplyLines.length ? `\n⭐️其他備品：\n${supplyLines.join("\n")}` : "",
-  notes ? `\n⭐️其他備註：\n${notes}` : ""
-].filter(Boolean).join("\n");
-      document.getElementById("output").textContent = blocks;
-      saveTodayStockLocal();
-      localStorage.setItem("inventoryDraft", JSON.stringify(collectFormData()));
-    }
-
-    async function saveCurrentDay() {
-      generateReport();
-
-      const payload = {
-        store: document.getElementById("store").value,
-        date: document.getElementById("date").value,
-        time: document.getElementById("time").value,
-        staff: document.getElementById("staff").value.trim(),
-        dailyRevenue: document.getElementById("dailyRevenue").value.trim(),
-        totalRevenue: document.getElementById("totalRevenue").value.trim(),
-        todayStockRows: getTodayStockRows(),
-        reportText: document.getElementById("output").textContent
-      };
-
-      try {
-        const result = await apiPost("saveInventory", payload);
-        if (result && result.ok) {
-          alert("已送出儲存。本日資料會寫入 Google Sheets，隔天可供不同裝置讀取。");
-        } else {
-          alert("已儲存在本機，但 Google Sheets 儲存可能失敗，請檢查 Apps Script。");
-        }
-      } catch (error) {
-        alert("已儲存在本機，但 Google Sheets 連線失敗。請檢查 Apps Script 部署與權限。");
-      }
-    }
-
-    async function copyReport() {
-      const text = document.getElementById("output").textContent;
-      if (!text || text.includes("按下「產生回報」")) {
-        alert("請先產生回報文字");
-        return;
-      }
-      try {
-        await navigator.clipboard.writeText(text);
-        alert("已複製，可以貼到 LINE 群組囉！");
-      } catch (e) {
-        alert("複製失敗，請手動選取文字複製。");
-      }
-    }
-
-    function collectFormData() {
-      return {
-        store: document.getElementById("store").value,
-        date: document.getElementById("date").value,
-        time: document.getElementById("time").value,
-        staff: document.getElementById("staff").value,
-        dailyRevenue: document.getElementById("dailyRevenue").value,
-        totalRevenue: document.getElementById("totalRevenue").value,
-        notes: document.getElementById("notes").value,
-        output: document.getElementById("output").textContent
-      };
-    }
-
-    function clearForm() {
-      if (!confirm("確定要清空本日資料嗎？")) return;
-      document.querySelectorAll("input, textarea").forEach(el => {
-        if (el.type !== "date" && el.type !== "time") el.value = "";
+      const expiryNames = Object.keys(expiryGroups).sort((a,b) => {
+        const ai = expiryOrder.indexOf(a);
+        const bi = expiryOrder.indexOf(b);
+        if(ai === -1 && bi === -1) return a.localeCompare(b, "zh-Hant");
+        if(ai === -1) return 1;
+        if(bi === -1) return -1;
+        return ai - bi;
       });
-      document.querySelectorAll("select").forEach(el => {
-        if (el.id !== "store") el.value = "正常";
+      const expiryLines = expiryNames.map(name => {
+        const rows = expiryGroups[name].sort((a,b) => {
+          if(a.status === "售完" && b.status !== "售完") return 1;
+          if(a.status !== "售完" && b.status === "售完") return -1;
+          return expiryEndDateValue(a.dateText) - expiryEndDateValue(b.dateText);
+        });
+        const lines = rows.map(item => {
+          const mark = item.status === "今日到期" ? "❗️" : (["即期","低庫存","售完"].includes(item.status) ? "⚠️" : "");
+          if(item.status === "售完") return mark + "售完";
+          return (mark + item.dateText + (item.qty ? "*" + item.qty : "")).trim();
+        });
+        if(lines.length === 1) return (name + " " + lines[0]).trim();
+        return [name, ...lines.map(line => "- " + line)].join(String.fromCharCode(10));
       });
-      document.querySelectorAll(".prevQty").forEach(el => el.textContent = "昨日：-");
-      document.getElementById("date").value = todayISO();
-      document.getElementById("time").value = nowTime();
-      document.getElementById("output").textContent = "按下「產生回報」後，這裡會出現整理好的盤點文字。";
-      async function updateRevenueHint() {
-  const store = document.getElementById("store").value;
-  const date = document.getElementById("date").value;
-  const daily = Number(document.getElementById("dailyRevenue").value || 0);
-  const totalInput = document.getElementById("totalRevenue");
-
-  let previousTotal = 0;
-
-  try {
-    const result = await apiJsonp("getMonthRevenue", { store, date });
-    if (result && result.ok) previousTotal = Number(result.total || 0);
-  } catch (e) {
-    previousTotal = 0;
-  }
-
-  if (daily) {
-    totalInput.value = previousTotal + daily;
-  }
-
-  const lines = [];
-  if (daily) lines.push(`當日業績${money(daily)}`);
-  if (totalInput.value) lines.push(`總營業額${money(totalInput.value)}`);
-
-  document.getElementById("revenueHint").textContent =
-    lines.length ? lines.join("｜") : "請直接填數字，系統會自動計算本月累計總營業額。";
-}
-      localStorage.removeItem("inventoryDraft");
+      const supplyLines = collectSupplyRows().map(item => { const mark = ["低庫存","售完"].includes(item.status) ? "⚠️" : (["即期","今日到期"].includes(item.status) ? "❗️" : ""); if(item.status === "售完") return `${mark}${item.name} 售完`; const parts = []; if(item.front) parts.push(`前場${item.front}`); if(item.back) parts.push(`後場${item.back}`); return `${mark}${item.name} ${parts.join("，")}`.trim(); });
+      const blocks = [ header, revenueLines.length ? revenueLines.join("
+") : "", salesLines.length ? `
+⭐️賣出顆數：
+${salesLines.join("
+")}` : "", yesterdayLines.length ? `
+⭐️昨日剩餘「泡芙、迷你派」數：
+${yesterdayLines.join("
+")}` : "", incomingLines.length ? `
+⭐️今日烤、進貨「泡芙、迷你派」數：
+${incomingLines.join("
+")}` : "", todayLines.length ? `
+⭐️今日剩餘「泡芙、迷你派」數：
+${todayLines.join("
+")}` : "", expiryLines.length ? `
+⭐️效期品庫存：
+${expiryLines.join("
+")}` : "", supplyLines.length ? `
+⭐️其他備品：
+${supplyLines.join("
+")}` : "", notes ? `
+⭐️其他備註：
+${notes}` : "" ].filter(Boolean).join("
+");
+      document.getElementById("output").textContent = blocks; saveTodayStockLocal(); localStorage.setItem("inventoryDraft", JSON.stringify(collectFormData())); return blocks;
     }
 
-    function init() {
-      document.getElementById("date").value = todayISO();
-      document.getElementById("time").value = nowTime();
-      renderSales();
-      renderSimpleStock("yesterdayTable", stockItems, "yesterdayQty", "yesterdayNote", true);
-      renderSimpleStock("incomingTable", incomingItems, "incomingQty", "incomingNote", false);
-      renderSimpleStock("todayTable", stockItems, "todayQty", "todayNote", false);
-      renderExpiryDefaults();
-      renderSupplies();
-      setTimeout(loadPreviousDayStock, 100);
+    function collectFormData(){ return { store:document.getElementById("store").value, date:document.getElementById("date").value, time:document.getElementById("time").value, staff:document.getElementById("staff").value, dailyRevenue:document.getElementById("dailyRevenue").value, totalRevenue:document.getElementById("totalRevenue").value, notes:document.getElementById("notes").value, output:document.getElementById("output").textContent }; }
+    async function saveCurrentDay(){ const reportText = generateReport(); const payload = { store:document.getElementById("store").value, date:document.getElementById("date").value, time:document.getElementById("time").value, staff:document.getElementById("staff").value.trim(), dailyRevenue:document.getElementById("dailyRevenue").value.trim(), totalRevenue:document.getElementById("totalRevenue").value.trim(), salesRows:collectSalesRows(), yesterdayRows:getRows("#yesterdayTable", ".yesterdayQty", ".yesterdayNote"), incomingRows:getRows("#incomingTable", ".incomingQty", ".incomingNote"), todayStockRows:getTodayStockRows(), expiryRows:collectExpiryRows(), supplyRows:collectSupplyRows(), notes:document.getElementById("notes").value.trim(), reportText };
+      try{ const result = await apiPost("saveInventory", payload); if(result && result.ok) alert("已送出儲存。Google Sheets 老闆總表會新增一筆完整盤點紀錄。"); else alert("已儲存在本機，但 Google Sheets 儲存可能失敗，請檢查 Apps Script。"); }catch(error){ alert("已儲存在本機，但 Google Sheets 連線失敗。請檢查 Apps Script 部署與權限。"); }
     }
-
+    async function copyReport(){ const text = document.getElementById("output").textContent; if(!text || text.includes("按下「產生回報」")){ alert("請先產生回報文字"); return; } try{ await navigator.clipboard.writeText(text); alert("已複製，可以貼到 LINE 群組囉！"); }catch(e){ alert("複製失敗，請手動選取文字複製。"); } }
+    function clearForm(){ if(!confirm("確定要清空本日資料嗎？")) return; document.querySelectorAll("input, textarea").forEach(el => { if(el.type !== "date" && el.type !== "time") el.value = ""; }); document.querySelectorAll("select").forEach(el => { if(el.id !== "store") el.value = "正常"; }); document.querySelectorAll(".prevQty").forEach(el => el.textContent = "昨日：-"); document.getElementById("date").value = todayISO(); document.getElementById("time").value = nowTime(); document.getElementById("output").textContent = "按下「產生回報」後，這裡會出現整理好的盤點文字。"; updateRevenueHint(false); localStorage.removeItem("inventoryDraft"); }
+    function init(){ document.getElementById("date").value = todayISO(); document.getElementById("time").value = nowTime(); renderSales(); renderSimpleStock("yesterdayTable", stockItems, "yesterdayQty", "yesterdayNote", true); renderSimpleStock("incomingTable", incomingItems, "incomingQty", "incomingNote", false); renderSimpleStock("todayTable", stockItems, "todayQty", "todayNote", false); renderExpiryDefaults(); renderSupplies(); setTimeout(() => { loadPreviousDayStock(); updateRevenueHint(); }, 100); }
     init();
   </script>
 </body>
