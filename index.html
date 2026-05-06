@@ -292,34 +292,64 @@ renderDiff(todayRow, ".todayQty", item.qty);
         });
       }
 
-  if(Array.isArray(data.expiryRows)){
+if(Array.isArray(data.expiryRows)){
   data.expiryRows.forEach(item => {
-    const row = [...document.querySelectorAll("#expiryTable tbody tr")]
-      .find(r => r.querySelector(".expiryName")?.value === item.name);
 
-    if(!row) return;
+    let row = [...document.querySelectorAll("#expiryTable tbody tr")]
+      .find(r =>
+        r.querySelector(".expiryName")?.value === item.name &&
+        !r.dataset.filledFromYesterday
+      );
+
+    // 同品項多效期時自動新增列
+    if(!row){
+
+      addExpiryRow(item.name);
+
+      const rows = [...document.querySelectorAll("#expiryTable tbody tr")];
+
+      row = rows[rows.length - 1];
+    }
+
+    row.dataset.filledFromYesterday = "true";
 
     const el = row.querySelector(".prev");
 
     if(el){
-      el.textContent = `昨日：${item.dateText || ""}${item.qty ? "*" + item.qty : ""}${item.status && item.status !== "正常" ? "（" + item.status + "）" : ""}`;
+      el.textContent =
+        `昨日：${item.dateText || ""}${item.qty ? "*" + item.qty : ""}${item.status && item.status !== "正常" ? "（" + item.status + "）" : ""}`;
+
       shownCount++;
     }
 
+    // 品項
+    const nameInput = row.querySelector(".expiryName");
+
+    if(nameInput && !nameInput.value){
+      nameInput.value = item.name || "";
+    }
+
+    // 效期
     const dateInput = row.querySelector(".expiryDate");
+
     if(dateInput && !dateInput.value){
       dateInput.value = item.dateText || "";
     }
 
+    // 數量
     const qtyInput = row.querySelector(".expiryQty");
+
     if(qtyInput && !qtyInput.value){
       qtyInput.value = item.qty || "";
     }
 
+    // 狀態
     const statusInput = row.querySelector(".expiryStatus");
+
     if(statusInput && item.status){
       statusInput.value = item.status;
     }
+
   });
 }
 
