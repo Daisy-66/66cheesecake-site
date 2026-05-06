@@ -75,11 +75,10 @@
   <script>
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxzOFFJgTdO9YP7UyiB-bsKHtAAk3dvuwjI_ScouqQW-XRN2QaUiWDMYd439uJogv7h/exec";
     const salesItems = [["焦糖","顆"],["提拉米蘇","顆"],["迷你酥","份"],["卡士達","杯"],["提拉米蘇卡士達","杯"],["巧克力卡士達","杯"]];
-    const stockItems = ["焦糖泡芙",”提拉米蘇泡芙","迷你派"];
-    const incomingItems = ["焦糖泡芙","提拉米蘇泡芙","迷你派","門市烤製"];
-    const expiryDefault = ["蛋糕","布丁","原味卡士達","提拉米蘇卡士達","巧克力卡士達","迷你派原味卡士達”,”泡芙殼”,”曲奇餅乾","丹麥卷原味","丹麥卷咖啡","丹麥卷巧克力","丹麥卷12入鐵盒","起司棒帕馬森","起司棒洋蔥","起司棒草莓"];
-    const supplies = ["迷你派10入盒 黃","迷你派10入盒 粉","迷你派10內襯","泡芙10入盒","提拉米蘇10入盒","草莓10入盒","泡芙30入組裝盒”,”30入內襯
-”,”保冷袋","蛋糕袋","大蛋糕提袋","冰淇淋盒","冰淇淋袋","黃色不織布袋","白色不織布袋","小牙刀","布丁湯匙","保冷劑","POS機卷","未摺蛋糕盒","塑膠杯","蠟燭","防潮糖粉","焦糖粉","可可粉","卡士達杯子 大","卡士達杯子 小","防油分裝紙袋"];
+const stockItems = ["焦糖泡芙", "提拉米蘇泡芙", "迷你派"];
+const incomingItems = ["焦糖泡芙", "提拉米蘇泡芙", "迷你派", "門市烤製"];
+const expiryDefault = ["蛋糕", "布丁", "原味卡士達", "提拉米蘇卡士達", "巧克力卡士達", "迷你派原味卡士達", "泡芙殼", "曲奇餅乾", "丹麥卷原味", "丹麥卷咖啡", "丹麥卷巧克力", "丹麥卷12入鐵盒", "起司棒帕馬森", "起司棒洋蔥", "起司棒草莓"];
+const supplies = ["迷你派10入盒 黃", "迷你派10入盒 粉", "迷你派10內襯", "泡芙10入盒", "提拉米蘇10入盒", "草莓10入盒", "泡芙30入組裝盒", "30入內襯", "保冷袋", "蛋糕袋", "大蛋糕提袋", "冰淇淋盒", "冰淇淋袋", "黃色不織布袋", "白色不織布袋", "小牙刀", "布丁湯匙", "保冷劑", "POS機卷", "未摺蛋糕盒", "塑膠杯", "蠟燭", "防潮糖粉", "焦糖粉", "可可粉", "卡士達杯子 大", "卡士達杯子 小", "防油分裝紙袋"];
 
     function todayISO(){ const d = new Date(); return d.toISOString().slice(0,10); }
     function nowTime(){ const d = new Date(); return `${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`; }
@@ -91,9 +90,9 @@
     function statusSelect(cls){ return `<select class="${cls}"><option value="正常">正常</option><option value="即期">即期</option><option value="今日到期">今日到期</option><option value="低庫存">低庫存</option><option value="售完">售完</option></select>`; }
     function rowValue(row, selector){ const el = row.querySelector(selector); return el ? el.value.trim() : ""; }
 
-    function renderSales(){ const tbody = document.querySelector("#salesTable tbody"); tbody.innerHTML = salesItems.map(([name,unit]) => `<tr data-name="${name}" data-unit="${unit}"><td class="item-name" data-label="品項">${name}</td><td data-label="賣出數">${inputHTML("salesQty","0")}</td><td data-label="單位">${unit}</td></tr>`).join(""); }
-    function renderSimpleStock(tableId, items, qtyClass, noteClass, showPrev=false){ const tbody = document.querySelector(`#${tableId} tbody`); tbody.innerHTML = items.map(name => `<tr data-name="${name}"><td class="item-name" data-label="品項">${name}</td><td data-label="數量">${showPrev ? `<span class="prevQty">昨日：-</span>` : ""}${inputHTML(qtyClass,"例如：3308顆 / 78包")}</td><td data-label="箱數 / 備註">${inputHTML(noteClass,"例如：10箱+0.5箱")}</td></tr>`).join(""); }
-    function renderSupplies(){ const tbody = document.querySelector("#suppliesTable tbody"); tbody.innerHTML = supplies.map(name => `<tr data-name="${name}"><td class="item-name" data-label="品項">${name}</td><td data-label="前場">${inputHTML("supplyFront","")}</td><td data-label="後場 / 箱子">${inputHTML("supplyBack","")}</td><td data-label="狀態">${statusSelect("supplyStatus")}</td></tr>`).join(""); }
+    function renderSales(){ const tbody = document.querySelector("#salesTable tbody"); tbody.innerHTML = salesItems.map(([name,unit]) => `<tr data-name="${name}" data-unit="${unit}"><td class="item-name" data-label="品項">${name}</td><td data-label="賣出數">${inputHTML("salesQty","0")}</td><td data-label="單位">${unit}</td></tr>`).join("\n"); }
+    function renderSimpleStock(tableId, items, qtyClass, noteClass, showPrev=false){ const tbody = document.querySelector(`#${tableId} tbody`); tbody.innerHTML = items.map(name => `<tr data-name="${name}"><td class="item-name" data-label="品項">${name}</td><td data-label="數量">${showPrev ? `<span class="prevQty">昨日：-</span>` : ""}${inputHTML(qtyClass,"例如：3308顆 / 78包")}</td><td data-label="箱數 / 備註">${inputHTML(noteClass,"例如：10箱+0.5箱")}</td></tr>`).join("\n"); }
+    function renderSupplies(){ const tbody = document.querySelector("#suppliesTable tbody"); tbody.innerHTML = supplies.map(name => `<tr data-name="${name}"><td class="item-name" data-label="品項">${name}</td><td data-label="前場">${inputHTML("supplyFront","")}</td><td data-label="後場 / 箱子">${inputHTML("supplyBack","")}</td><td data-label="狀態">${statusSelect("supplyStatus")}</td></tr>`).join("\n"); }
     function addExpiryRow(name=""){ const tbody = document.querySelector("#expiryTable tbody"); const tr = document.createElement("tr"); tr.innerHTML = `<td data-label="品項"><input class="expiryName" placeholder="品項" value="${name}" /></td><td data-label="效期"><input class="expiryDate" placeholder="例如：4/26-5/2" /></td><td data-label="數量"><input class="expiryQty" placeholder="例如：4包+3條" /></td><td data-label="狀態">${statusSelect("expiryStatus")}</td>`; tbody.appendChild(tr); }
     function renderExpiryDefaults(){ expiryDefault.forEach(name => addExpiryRow(name)); }
 
@@ -124,8 +123,13 @@
 
     function generateReport(){ const store = document.getElementById("store").value; const date = document.getElementById("date").value; const time = document.getElementById("time").value; const staff = document.getElementById("staff").value.trim(); const notes = document.getElementById("notes").value.trim(); const dailyRevenue = document.getElementById("dailyRevenue").value.trim(); const totalRevenue = document.getElementById("totalRevenue").value.trim(); const header = `${formatDate(date)}${time ? time.replace(":","點") : ""}${store}庫存${staff ? `｜填寫：${staff}` : ""}`;
       const revenueLines = []; if(dailyRevenue) revenueLines.push(`當日業績${money(dailyRevenue)}`); if(totalRevenue) revenueLines.push(`總營業額${money(totalRevenue)}`);
-      const salesLines = collectSalesRows().map(item => `${item.name}賣出${item.qty}${item.unit}`);
-      const yesterdayLines = sectionFromRows("#yesterdayTable", ".yesterdayQty", ".yesterdayNote", (name,qty,note) => `${name}${qty}${note ? `（${note}）` : ""}`);
+const salesData = collectSalesRows();
+
+const salesLines = salesItems.map(([name, unit]) => {
+  const found = salesData.find(i => i.name === name);
+  const qty = found ? found.qty : "0";
+  return `${name}賣出${qty}${unit}`;
+});      const yesterdayLines = sectionFromRows("#yesterdayTable", ".yesterdayQty", ".yesterdayNote", (name,qty,note) => `${name}${qty}${note ? `（${note}）` : ""}`);
       const incomingLines = sectionFromRows("#incomingTable", ".incomingQty", ".incomingNote", (name,qty,note) => `${name}${qty || ""}${note ? `（${note}）` : ""}`);
       const todayLines = sectionFromRows("#todayTable", ".todayQty", ".todayNote", (name,qty,note) => `${name}${qty}${note ? `（${note}）` : ""}`);
       const expiryOrder = ["蛋糕","布丁","原味卡士達","提拉米蘇卡士達","巧克力卡士達","迷你派原味卡士達","曲奇餅乾","丹麥卷原味","丹麥卷咖啡","丹麥卷巧克力","丹麥卷12入鐵盒","起司棒帕馬森","起司棒洋蔥","起司棒草莓"];
@@ -169,29 +173,21 @@
         return [name, ...lines.map(line => "- " + line)].join(String.fromCharCode(10));
       });
       const supplyLines = collectSupplyRows().map(item => { const mark = ["低庫存","售完"].includes(item.status) ? "⚠️" : (["即期","今日到期"].includes(item.status) ? "❗️" : ""); if(item.status === "售完") return `${mark}${item.name} 售完`; const parts = []; if(item.front) parts.push(`前場${item.front}`); if(item.back) parts.push(`後場${item.back}`); return `${mark}${item.name} ${parts.join("，")}`.trim(); });
-      const blocks = [ header, revenueLines.length ? revenueLines.join("
-") : "", salesLines.length ? `
+      const blocks = [ header, revenueLines.length ? revenueLines.join("\n") : "", salesLines.length ? `
 ⭐️賣出顆數：
-${salesLines.join("
-")}` : "", yesterdayLines.length ? `
+${salesLines.join("\n")}` : "", yesterdayLines.length ? `
 ⭐️昨日剩餘「泡芙、迷你派」數：
-${yesterdayLines.join("
-")}` : "", incomingLines.length ? `
+${yesterdayLines.join("\n")}` : "", incomingLines.length ? `
 ⭐️今日烤、進貨「泡芙、迷你派」數：
-${incomingLines.join("
-")}` : "", todayLines.length ? `
+${incomingLines.join("\n")}` : "", todayLines.length ? `
 ⭐️今日剩餘「泡芙、迷你派」數：
-${todayLines.join("
-")}` : "", expiryLines.length ? `
+${todayLines.join("\n")}` : "", expiryLines.length ? `
 ⭐️效期品庫存：
-${expiryLines.join("
-")}` : "", supplyLines.length ? `
+${expiryLines.join("\n")}` : "", supplyLines.length ? `
 ⭐️其他備品：
-${supplyLines.join("
-")}` : "", notes ? `
+${supplyLines.join("\n")}` : "", notes ? `
 ⭐️其他備註：
-${notes}` : "" ].filter(Boolean).join("
-");
+${notes}` : "" ].filter(Boolean).join("\n");
       document.getElementById("output").textContent = blocks; saveTodayStockLocal(); localStorage.setItem("inventoryDraft", JSON.stringify(collectFormData())); return blocks;
     }
 
