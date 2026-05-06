@@ -37,6 +37,55 @@
     .hint { color:var(--muted); font-size:13px; margin-top:8px; }
     .pill { display:inline-block; padding:2px 8px; border-radius:999px; background:#fff2dc; color:var(--main-dark); font-size:12px; margin-left:4px; }
     @media (max-width:760px) { header h1{font-size:21px;} main{padding:14px;} .grid,.grid-2{grid-template-columns:1fr;} .card{padding:14px;border-radius:16px;} table,thead,tbody,th,td,tr{display:block;} thead{display:none;} tr{border:1px solid var(--line); border-radius:14px; padding:10px; margin-bottom:10px; background:#fffdfa;} td{border:none; padding:5px 0;} td::before{content:attr(data-label); display:block; font-size:12px; color:var(--muted); font-weight:800; margin-bottom:2px;} .item-name::before{display:none;} .actions{grid-template-columns:1fr; padding:10px 14px 14px;} }
+
+    .toggleActions {
+  display: none;
+}
+
+.actionButtons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+@media (max-width: 760px) {
+  .actions {
+    display: block;
+    padding: 8px 12px;
+  }
+
+  .toggleActions {
+    display: block;
+    width: 100%;
+    margin-bottom: 6px;
+    background: #7a4b20;
+    color: #fff;
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  .actionButtons {
+    display: none;
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .actions.open .actionButtons {
+    display: grid;
+  }
+}
+    .collapsible h2{
+  cursor:pointer;
+  user-select:none;
+}
+
+.sectionContent{
+  margin-top:16px;
+}
+
+.collapsible.closed .sectionContent{
+  display:none;
+}
   </style>
 </head>
 <body>
@@ -62,19 +111,39 @@
       <p class="hint" id="revenueHint">請直接填當日業績，系統會抓同門市本月前面日期累計後自動加總。</p>
     </section>
 
-    <section class="card"><h2>③ 賣出顆數 / 份數</h2><table id="salesTable"><thead><tr><th>品項</th><th>賣出數</th><th>單位</th></tr></thead><tbody></tbody></table></section>
-    <section class="card"><h2>④ 昨日剩餘「泡芙、迷你派」數</h2><button class="secondary" type="button" onclick="loadPreviousDayStock()">顯示前一天數量</button><p class="hint" id="previousHint">尚未讀取前一天資料。</p><table id="yesterdayTable"><thead><tr><th>品項</th><th>數量</th><th>箱數 / 備註</th></tr></thead><tbody></tbody></table></section>
-    <section class="card"><h2>⑤ 今日烤 / 進貨數</h2><table id="incomingTable"><thead><tr><th>品項</th><th>數量</th><th>備註</th></tr></thead><tbody></tbody></table></section>
-    <section class="card"><h2>⑥ 今日剩餘「泡芙、迷你派」數</h2><table id="todayTable"><thead><tr><th>品項</th><th>數量</th><th>箱數 / 備註</th></tr></thead><tbody></tbody></table></section>
-    <section class="card"><h2>⑦ 效期品庫存 <span class="pill">可填多筆</span></h2><table id="expiryTable"><thead><tr><th>品項</th><th>效期</th><th>數量</th><th>狀態</th></tr></thead><tbody></tbody></table><button class="secondary" type="button" onclick="addExpiryRow()">＋新增效期品</button><p class="hint">狀態可選：正常、即期、今日到期、售完。</p></section>
-    <section class="card"><h2>⑧ 備品庫存</h2><table id="suppliesTable"><thead><tr><th>品項</th><th>前場</th><th>後場 / 箱子</th><th>狀態</th></tr></thead><tbody></tbody></table></section>
+   <section class="card"><h2>③ 賣出顆數 / 份數</h2><table id="salesTable"><thead><tr><th>品項</th><th>賣出數</th><th>單位</th></tr></thead><tbody></tbody></table></section>
+<section class="card collapsible">
+<h2 onclick="toggleSection(this)">▼ ④ 昨日剩餘「泡芙、迷你派」數</h2>
+<div class="sectionContent"><button class="secondary" type="button" onclick="loadPreviousDayStock()">顯示前一天數量</button><p class="hint" id="previousHint">尚未讀取前一天資料。</p><table id="yesterdayTable"><thead><tr><th>品項</th><th>數量</th><th>箱數 / 備註</th></tr></thead><tbody></tbody></table></div></section>
+<section class="card collapsible">
+<h2 onclick="toggleSection(this)">▼ ⑤ 今日烤 / 進貨數</h2>
+<div class="sectionContent"><table id="incomingTable"><thead><tr><th>品項</th><th>數量</th><th>備註</th></tr></thead><tbody></tbody></table></div></section>
+<h2 onclick="toggleSection(this)">▼ ⑥ 今日剩餘「泡芙、迷你派」數</h2>
+<div class="sectionContent"></div><table id="todayTable"><thead><tr><th>品項</th><th>數量</th><th>箱數 / 備註</th></tr></thead><tbody></tbody></table></section>
+    <section class="card collapsible">
+<h2 onclick="toggleSection(this)">▼ ⑦ 效期品庫存 <span class="pill">可填多筆</span></h2>
+<div class="sectionContent"></div> <span class="pill">可填多筆</span></h2><table id="expiryTable"><thead><tr><th>品項</th><th>效期</th><th>數量</th><th>狀態</th></tr></thead><tbody></tbody></table><button class="secondary" type="button" onclick="addExpiryRow()">＋新增效期品</button><p class="hint">狀態可選：正常、即期、今日到期、售完。</p></section>
+    <section class="card collapsible">
+<h2 onclick="toggleSection(this)">▼ ⑧ 備品庫存</h2>
+<div class="sectionContent"></div><table id="suppliesTable"><thead><tr><th>品項</th><th>前場</th><th>後場 / 箱子</th><th>狀態</th></tr></thead><tbody></tbody></table></section>
     <section class="card"><h2>⑨ 其他備註</h2><textarea id="notes" placeholder="例如：草莓泡芙做泡芙殼3.5箱、後面大冰箱、異常狀況等"></textarea></section>
     <section class="card"><h2>LINE 回報文字</h2><div id="output" class="output">按下「產生回報」後，這裡會出現整理好的盤點文字。</div></section>
   </main>
 
-  <div class="actions"><button class="primary" onclick="generateReport()">產生回報</button><button class="secondary" onclick="saveCurrentDay()">儲存本日資料</button><button class="secondary" onclick="copyReport()">一鍵複製</button><button class="danger" onclick="clearForm()">清空本日資料</button></div>
-
+<div class="actions" id="actionBar">
+  <button class="toggleActions" type="button" onclick="toggleActions()">▲ 操作選單</button>
+  <div class="actionButtons">
+    <button class="primary" onclick="generateReport()">產生回報</button>
+    <button class="secondary" onclick="saveCurrentDay()">儲存本日資料</button>
+    <button class="secondary" onclick="copyReport()">一鍵複製</button>
+    <button class="danger" onclick="clearForm()">清空本日資料</button>
+  </div>
+</div>
   <script>
+
+  function toggleActions(){
+  document.getElementById("actionBar").classList.toggle("open");
+}
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxzOFFJgTdO9YP7UyiB-bsKHtAAk3dvuwjI_ScouqQW-XRN2QaUiWDMYd439uJogv7h/exec";
     const salesItems = [["焦糖","顆"],["提拉米蘇","顆"],["迷你酥","份"],["卡士達","杯"],["提拉米蘇卡士達","杯"],["巧克力卡士達","杯"]];
 const stockItems = ["焦糖泡芙", "提拉米蘇泡芙", "迷你派"];
@@ -522,6 +591,19 @@ function loadDraft(){
   }catch(e){
     console.warn(e);
   }
+}
+    function toggleSection(el){
+
+  const section = el.closest(".collapsible");
+
+  section.classList.toggle("closed");
+
+  if(section.classList.contains("closed")){
+    el.innerHTML = el.innerHTML.replace("▼","▶");
+  }else{
+    el.innerHTML = el.innerHTML.replace("▶","▼");
+  }
+
 }
   </script>
 </body>
