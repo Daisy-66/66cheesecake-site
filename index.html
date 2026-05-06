@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
@@ -25,7 +26,8 @@
     th { text-align:left; color:var(--muted); font-size:12px; font-weight:800; }
     td input, td select { font-size:14px; padding:8px 9px; border-radius:10px; }
     .item-name { font-weight:800; color:var(--text); min-width:86px; }
-    .prevQty { font-size:12px; color:#9a8576; margin-bottom:2px; display:block; }
+    .prevQty, .prev { font-size:12px; color:#9a8576; margin-bottom:2px; display:block; }
+    .diffQty { font-size:12px; margin-top:2px; font-weight:700; }
     .actions { position:sticky; bottom:0; background:rgba(255,248,239,.95); backdrop-filter:blur(8px); padding:12px 18px 18px; border-top:1px solid var(--line); display:grid; grid-template-columns:repeat(4,1fr); gap:10px; max-width:980px; margin:0 auto; }
     button { border:none; border-radius:14px; padding:13px 14px; font-size:15px; font-weight:800; cursor:pointer; }
     .primary { background:var(--main); color:white; }
@@ -105,10 +107,10 @@ const expiryDefault = [
     function statusSelect(cls){ return `<select class="${cls}"><option value="正常">正常</option><option value="即期">即期</option><option value="今日到期">今日到期</option><option value="低庫存">低庫存</option><option value="售完">售完</option></select>`; }
     function rowValue(row, selector){ const el = row.querySelector(selector); return el ? el.value.trim() : ""; }
 
-    function renderSales(){ const tbody = document.querySelector("#salesTable tbody"); tbody.innerHTML = salesItems.map(([name,unit]) => `<tr data-name="${name}" data-unit="${unit}"><td class="item-name" data-label="品項">${name}</td><td data-label="賣出數">${inputHTML("salesQty","0")}</td><td data-label="單位">${unit}</td></tr>`).join("\n"); }
-    function renderSimpleStock(tableId, items, qtyClass, noteClass, showPrev=false){ const tbody = document.querySelector(`#${tableId} tbody`); tbody.innerHTML = items.map(name => `<tr data-name="${name}"><td class="item-name" data-label="品項">${name}</td><td data-label="數量">${showPrev ? `<span class="prevQty">昨日：-</span>` : ""}${inputHTML(qtyClass,"例如：3308顆 / 78包")}</td><td data-label="箱數 / 備註">${inputHTML(noteClass,"例如：10箱+0.5箱")}</td></tr>`).join("\n"); }
-    function renderSupplies(){ const tbody = document.querySelector("#suppliesTable tbody"); tbody.innerHTML = supplies.map(name => `<tr data-name="${name}"><td class="item-name" data-label="品項">${name}</td><td data-label="前場">${inputHTML("supplyFront","")}</td><td data-label="後場 / 箱子">${inputHTML("supplyBack","")}</td><td data-label="狀態">${statusSelect("supplyStatus")}</td></tr>`).join("\n"); }
-    function addExpiryRow(name=""){ const tbody = document.querySelector("#expiryTable tbody"); const tr = document.createElement("tr"); tr.innerHTML = `<td data-label="品項"><input class="expiryName" placeholder="品項" value="${name}" /></td><td data-label="效期"><input class="expiryDate" placeholder="例如：4/26-5/2" /></td><td data-label="數量"><input class="expiryQty" placeholder="例如：4包+3條" /></td><td data-label="狀態">${statusSelect("expiryStatus")}</td>`; tbody.appendChild(tr); }
+    function renderSales(){ const tbody = document.querySelector("#salesTable tbody"); tbody.innerHTML = salesItems.map(([name,unit]) => `<tr data-name="${name}" data-unit="${unit}"><td class="item-name" data-label="品項">${name}</td><td data-label="賣出數">${inputHTML("salesQty","0")}<div class="prev">昨日：-</div></td><td data-label="單位">${unit}</td></tr>`).join("\n"); }
+    function renderSimpleStock(tableId, items, qtyClass, noteClass, showPrev=false){ const tbody = document.querySelector(`#${tableId} tbody`); tbody.innerHTML = items.map(name => `<tr data-name="${name}"><td class="item-name" data-label="品項">${name}</td><td data-label="數量">${inputHTML(qtyClass,"例如：3308顆 / 78包")}<div class="prev">昨日：-</div></td><td data-label="箱數 / 備註">${inputHTML(noteClass,"例如：10箱+0.5箱")}</td></tr>`).join("\n"); }
+    function renderSupplies(){ const tbody = document.querySelector("#suppliesTable tbody"); tbody.innerHTML = supplies.map(name => `<tr data-name="${name}"><td class="item-name" data-label="品項">${name}</td><td data-label="前場">${inputHTML("supplyFront","")}<div class="prev">昨日：-</div></td><td data-label="後場 / 箱子">${inputHTML("supplyBack","")}</td><td data-label="狀態">${statusSelect("supplyStatus")}</td></tr>`).join("\n"); }
+    function addExpiryRow(name=""){ const tbody = document.querySelector("#expiryTable tbody"); const tr = document.createElement("tr"); tr.innerHTML = `<td data-label="品項"><input class="expiryName" placeholder="品項" value="${name}" /></td><td data-label="效期"><input class="expiryDate" placeholder="例如：4/26-5/2" /></td><td data-label="數量"><input class="expiryQty" placeholder="例如：4包+3條" /><div class="prev">昨日：-</div></td><td data-label="狀態">${statusSelect("expiryStatus")}</td>`; tbody.appendChild(tr); }
     function renderExpiryDefaults(){ expiryDefault.forEach(name => addExpiryRow(name)); }
 
     function apiJsonp(action, payload){ return new Promise((resolve,reject)=>{ const callbackName = `jsonp_${Date.now()}_${Math.floor(Math.random()*100000)}`; const params = new URLSearchParams({ action, callback:callbackName, ...payload }); const script = document.createElement("script"); script.src = `${GOOGLE_SCRIPT_URL}?${params.toString()}`; window[callbackName] = data => { delete window[callbackName]; script.remove(); resolve(data); }; script.onerror = () => { delete window[callbackName]; script.remove(); reject(new Error("JSONP request failed")); }; document.body.appendChild(script); }); }
@@ -123,55 +125,137 @@ const expiryDefault = [
     function stockStorageKey(store,date){ return `inventoryStock:${store}:${date}`; }
     function saveTodayStockLocal(){ const store = document.getElementById("store").value; const date = document.getElementById("date").value; if(!store || !date) return; localStorage.setItem(stockStorageKey(store,date), JSON.stringify(getTodayStockRows())); }
 
-async function loadPreviousDayStock(){
-  const store = document.getElementById("store").value;
-  const date = document.getElementById("date").value;
-  const hint = document.getElementById("previousHint");
-
-  if(!store || !date) return;
-
-  const prevDate = previousDateISO(date);
-  let previousRows = [];
-  let sourceText = "";
-
-  try {
-    const result = await apiPost("getPreviousStock", { store, date });
-
-    if(result && result.ok && Array.isArray(result.rows) && result.rows.length){
-      previousRows = result.rows;
-      sourceText = "Google Sheets";
+function extractNumber(text){
+      if(!text) return null;
+      const match = String(text).match(/-?\d+(\.\d+)?/);
+      return match ? Number(match[0]) : null;
     }
-  } catch(error) {
-    console.warn("Google Sheets 讀取失敗", error);
-  }
 
-  document.querySelectorAll("#yesterdayTable .prevQty").forEach(el => {
-    el.textContent = "昨日：-";
-  });
-
-  if(!previousRows.length){
-    if(hint) hint.textContent = `找不到 ${prevDate} ${store} 的前一天庫存紀錄。`;
-    return;
-  }
-
-  previousRows.forEach(item => {
-    const row = [...document.querySelectorAll("#yesterdayTable tbody tr")]
-      .find(r => r.dataset.name === item.name);
-
-    if(!row) return;
-
-    const prevLabel = row.querySelector(".prevQty");
-    const noteText = item.note ? `（${item.note}）` : "";
-
-    if(prevLabel) {
-      prevLabel.textContent = `昨日：${item.qty || "-"}${noteText}`;
+    function renderDiff(row, inputSelector, prevValue){
+      const input = row.querySelector(inputSelector);
+      if(!input) return;
+      const current = extractNumber(input.value);
+      const previous = extractNumber(prevValue);
+      let diffEl = row.querySelector(".diffQty");
+      if(!diffEl){
+        diffEl = document.createElement("div");
+        diffEl.className = "diffQty";
+        input.parentElement.appendChild(diffEl);
+      }
+      if(current === null || previous === null){
+        diffEl.textContent = "";
+        return;
+      }
+      const diff = current - previous;
+      if(diff < 0){
+        diffEl.textContent = `差異：${diff} ⚠️`;
+        diffEl.style.color = "#dc2626";
+      }else{
+        diffEl.textContent = `差異：+${diff}`;
+        diffEl.style.color = "#16a34a";
+      }
     }
-  });
 
-  if(hint) {
-    hint.textContent = `已顯示 ${prevDate} ${store} 的前一天數量（來源：${sourceText}）。`;
-  }
-}
+    async function loadPreviousDayStock(){
+      const store = document.getElementById("store").value;
+      const date = document.getElementById("date").value;
+      const hint = document.getElementById("previousHint");
+      if(!store || !date) return;
+      const prevDate = previousDateISO(date);
+      let data = null;
+
+      try{
+        const result = await apiPost("getPreviousStock", { store, date });
+        if(result && result.ok) data = result;
+      }catch(e){
+        console.warn("Google Sheets 前一天資料讀取失敗", e);
+      }
+
+      document.querySelectorAll(".prev").forEach(el => el.textContent = "昨日：-");
+      document.querySelectorAll(".diffQty").forEach(el => el.textContent = "");
+
+      if(!data){
+        if(hint) hint.textContent = `找不到 ${prevDate} ${store} 的前一天資料`;
+        return;
+      }
+
+      let shownCount = 0;
+
+      if(Array.isArray(data.salesRows)){
+        data.salesRows.forEach(item => {
+          const row = document.querySelector(`#salesTable tr[data-name="${item.name}"]`);
+          if(!row) return;
+          const el = row.querySelector(".prev");
+          if(el){ el.textContent = `昨日：${item.qty || 0}${item.unit || ""}`; shownCount++; }
+        });
+      }
+
+      if(Array.isArray(data.yesterdayRows)){
+        data.yesterdayRows.forEach(item => {
+          const row = document.querySelector(`#yesterdayTable tr[data-name="${item.name}"]`);
+          if(!row) return;
+          const el = row.querySelector(".prev");
+          const noteText = item.note ? `（${item.note}）` : "";
+          if(el){ el.textContent = `昨日：${item.qty || "-"}${noteText}`; shownCount++; }
+        });
+      }
+
+      if(Array.isArray(data.incomingRows)){
+        data.incomingRows.forEach(item => {
+          const row = document.querySelector(`#incomingTable tr[data-name="${item.name}"]`);
+          if(!row) return;
+          const el = row.querySelector(".prev");
+          const noteText = item.note ? `（${item.note}）` : "";
+          if(el){ el.textContent = `昨日：${item.qty || "-"}${noteText}`; shownCount++; }
+        });
+      }
+
+      if(Array.isArray(data.todayStockRows)){
+        data.todayStockRows.forEach(item => {
+          const noteText = item.note ? `（${item.note}）` : "";
+
+          const yesterdayRow = document.querySelector(`#yesterdayTable tr[data-name="${item.name}"]`);
+          if(yesterdayRow){
+            const el = yesterdayRow.querySelector(".prev");
+            if(el){ el.textContent = `昨日今日剩餘：${item.qty || "-"}${noteText}`; shownCount++; }
+          }
+
+          const todayRow = document.querySelector(`#todayTable tr[data-name="${item.name}"]`);
+          if(todayRow){
+            const el = todayRow.querySelector(".prev");
+            if(el){ el.textContent = `昨日：${item.qty || "-"}${noteText}`; shownCount++; }
+            renderDiff(todayRow, ".todayQty", item.qty);
+          }
+        });
+      }
+
+      if(Array.isArray(data.expiryRows)){
+        data.expiryRows.forEach(item => {
+          const row = [...document.querySelectorAll("#expiryTable tbody tr")]
+            .find(r => r.querySelector(".expiryName")?.value === item.name);
+          if(!row) return;
+          const el = row.querySelector(".prev");
+          if(el){ el.textContent = `昨日：${item.dateText || ""}${item.qty ? "*" + item.qty : ""}${item.status && item.status !== "正常" ? "（" + item.status + "）" : ""}`; shownCount++; }
+        });
+      }
+
+      if(Array.isArray(data.supplyRows)){
+        data.supplyRows.forEach(item => {
+          const row = document.querySelector(`#suppliesTable tr[data-name="${item.name}"]`);
+          if(!row) return;
+          const el = row.querySelector(".prev");
+          const parts = [];
+          if(item.front) parts.push(`前場${item.front}`);
+          if(item.back) parts.push(`後場${item.back}`);
+          if(item.status && item.status !== "正常") parts.push(item.status);
+          if(el){ el.textContent = `昨日：${parts.length ? parts.join("，") : "-"}`; shownCount++; }
+        });
+      }
+
+      if(hint){
+        hint.textContent = shownCount ? `已顯示 ${prevDate} ${store} 的完整前一天資料` : `找不到 ${prevDate} ${store} 的前一天資料`;
+      }
+    }
 
     function collectSalesRows(){ return [...document.querySelectorAll("#salesTable tbody tr")].map(row => ({ name: row.dataset.name, unit: row.dataset.unit, qty: rowValue(row,".salesQty") })).filter(item => item.qty); }
     function collectExpiryRows(){ return [...document.querySelectorAll("#expiryTable tbody tr")].map(row => ({ name: rowValue(row,".expiryName"), dateText: rowValue(row,".expiryDate"), qty: rowValue(row,".expiryQty"), status: rowValue(row,".expiryStatus") })).filter(item => item.name && (item.dateText || item.qty || item.status !== "正常")); }
@@ -252,8 +336,19 @@ ${notes}` : "" ].filter(Boolean).join("\n");
       try{ const result = await apiPost("saveInventory", payload); if(result && result.ok) alert("已送出儲存。Google Sheets 老闆總表會新增一筆完整盤點紀錄。"); else alert("已儲存在本機，但 Google Sheets 儲存可能失敗，請檢查 Apps Script。"); }catch(error){ alert("已儲存在本機，但 Google Sheets 連線失敗。請檢查 Apps Script 部署與權限。"); }
     }
     async function copyReport(){ const text = document.getElementById("output").textContent; if(!text || text.includes("按下「產生回報」")){ alert("請先產生回報文字"); return; } try{ await navigator.clipboard.writeText(text); alert("已複製，可以貼到 LINE 群組囉！"); }catch(e){ alert("複製失敗，請手動選取文字複製。"); } }
-    function clearForm(){ if(!confirm("確定要清空本日資料嗎？")) return; document.querySelectorAll("input, textarea").forEach(el => { if(el.type !== "date" && el.type !== "time") el.value = ""; }); document.querySelectorAll("select").forEach(el => { if(el.id !== "store") el.value = "正常"; }); document.querySelectorAll(".prevQty").forEach(el => el.textContent = "昨日：-"); document.getElementById("date").value = todayISO(); document.getElementById("time").value = nowTime(); document.getElementById("output").textContent = "按下「產生回報」後，這裡會出現整理好的盤點文字。"; updateRevenueHint(false); localStorage.removeItem("inventoryDraft"); }
-    function init(){ document.getElementById("date").value = todayISO(); document.getElementById("time").value = nowTime(); renderSales(); renderSimpleStock("yesterdayTable", stockItems, "yesterdayQty", "yesterdayNote", true); renderSimpleStock("incomingTable", incomingItems, "incomingQty", "incomingNote", false); renderSimpleStock("todayTable", stockItems, "todayQty", "todayNote", false); renderExpiryDefaults(); renderSupplies(); setTimeout(() => { loadPreviousDayStock(); updateRevenueHint(); }, 100); }
+    function clearForm(){ if(!confirm("確定要清空本日資料嗎？")) return; document.querySelectorAll("input, textarea").forEach(el => { if(el.type !== "date" && el.type !== "time") el.value = ""; }); document.querySelectorAll("select").forEach(el => { if(el.id !== "store") el.value = "正常"; }); document.querySelectorAll(".prev").forEach(el => el.textContent = "昨日：-");
+      document.querySelectorAll(".diffQty").forEach(el => el.textContent = ""); document.getElementById("date").value = todayISO(); document.getElementById("time").value = nowTime(); document.getElementById("output").textContent = "按下「產生回報」後，這裡會出現整理好的盤點文字。"; updateRevenueHint(false); localStorage.removeItem("inventoryDraft"); }
+
+    function setupDiffListeners(){
+      document.querySelectorAll("#todayTable .todayQty").forEach(input => {
+        input.addEventListener("input", () => {
+          const row = input.closest("tr");
+          const prevText = row?.querySelector(".prev")?.textContent || "";
+          renderDiff(row, ".todayQty", prevText);
+        });
+      });
+    }
+    function init(){ document.getElementById("date").value = todayISO(); document.getElementById("time").value = nowTime(); renderSales(); renderSimpleStock("yesterdayTable", stockItems, "yesterdayQty", "yesterdayNote", true); renderSimpleStock("incomingTable", incomingItems, "incomingQty", "incomingNote", false); renderSimpleStock("todayTable", stockItems, "todayQty", "todayNote", false); renderExpiryDefaults(); renderSupplies(); setupDiffListeners(); setTimeout(() => { loadPreviousDayStock(); updateRevenueHint(); }, 100); }
     init();
   </script>
 </body>
