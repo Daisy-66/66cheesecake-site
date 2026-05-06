@@ -648,40 +648,17 @@
         return `${mark}${name} ${parts.join("，")}`.trim();
       }).filter(Boolean);
 
-      const blocks = [
-        header,
-        revenueLines.length ? revenueLines.join("
-") : "",
-        salesLines.length ? `
-⭐️賣出顆數：
-${salesLines.join("
-")}` : "",
-        yesterdayLines.length ? `
-⭐️昨日剩餘「泡芙、迷你派」數：
-${yesterdayLines.join("
-")}` : "",
-        incomingLines.length ? `
-⭐️今日烤、進貨「泡芙、迷你派」數：
-${incomingLines.join("
-")}` : "",
-        todayLines.length ? `
-⭐️今日剩餘「泡芙、迷你派」數：
-${todayLines.join("
-")}` : "",
-        expiryLines.length ? `
-⭐️效期品庫存：
-${expiryLines.join("
-")}` : "",
-        supplyLines.length ? `
-⭐️其他備品：
-${supplyLines.join("
-")}` : "",
-        notes ? `
-⭐️其他備註：
-${notes}` : ""
-      ].filter(Boolean).join("
-");
-
+const blocks = [
+  header,
+  revenueLines.length ? revenueLines.join("\n") : "",
+  salesLines.length ? `\n⭐️賣出顆數：\n${salesLines.join("\n")}` : "",
+  yesterdayLines.length ? `\n⭐️昨日剩餘「泡芙、迷你派」數：\n${yesterdayLines.join("\n")}` : "",
+  incomingLines.length ? `\n⭐️今日烤、進貨「泡芙、迷你派」數：\n${incomingLines.join("\n")}` : "",
+  todayLines.length ? `\n⭐️今日剩餘「泡芙、迷你派」數：\n${todayLines.join("\n")}` : "",
+  expiryLines.length ? `\n⭐️效期品庫存：\n${expiryLines.join("\n")}` : "",
+  supplyLines.length ? `\n⭐️其他備品：\n${supplyLines.join("\n")}` : "",
+  notes ? `\n⭐️其他備註：\n${notes}` : ""
+].filter(Boolean).join("\n");
       document.getElementById("output").textContent = blocks;
       saveTodayStockLocal();
       localStorage.setItem("inventoryDraft", JSON.stringify(collectFormData()));
@@ -752,7 +729,32 @@ ${notes}` : ""
       document.getElementById("date").value = todayISO();
       document.getElementById("time").value = nowTime();
       document.getElementById("output").textContent = "按下「產生回報」後，這裡會出現整理好的盤點文字。";
-      updateRevenueHint();
+      async function updateRevenueHint() {
+  const store = document.getElementById("store").value;
+  const date = document.getElementById("date").value;
+  const daily = Number(document.getElementById("dailyRevenue").value || 0);
+  const totalInput = document.getElementById("totalRevenue");
+
+  let previousTotal = 0;
+
+  try {
+    const result = await apiJsonp("getMonthRevenue", { store, date });
+    if (result && result.ok) previousTotal = Number(result.total || 0);
+  } catch (e) {
+    previousTotal = 0;
+  }
+
+  if (daily) {
+    totalInput.value = previousTotal + daily;
+  }
+
+  const lines = [];
+  if (daily) lines.push(`當日業績${money(daily)}`);
+  if (totalInput.value) lines.push(`總營業額${money(totalInput.value)}`);
+
+  document.getElementById("revenueHint").textContent =
+    lines.length ? lines.join("｜") : "請直接填數字，系統會自動計算本月累計總營業額。";
+}
       localStorage.removeItem("inventoryDraft");
     }
 
