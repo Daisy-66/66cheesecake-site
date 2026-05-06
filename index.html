@@ -121,6 +121,125 @@
   .actions.open .actionButtons{ display:grid; }
 }
 
+
+
+/* ===== 手機緊湊版：縮短每一區與每個品項高度 ===== */
+@media (max-width: 760px) {
+  body { font-size: 14px; overflow-x: hidden; }
+  header { padding: 18px 16px 16px; position: static; }
+  header h1 { font-size: 28px !important; line-height: 1.15; }
+  header p { font-size: 15px; margin-top: 6px; }
+  main { padding: 10px; }
+
+  .card {
+    padding: 14px !important;
+    margin-bottom: 12px !important;
+    border-radius: 18px !important;
+    box-shadow: 0 3px 12px rgba(122,75,32,.04);
+  }
+  .card h2 {
+    font-size: 20px !important;
+    line-height: 1.25;
+    margin-bottom: 8px !important;
+  }
+  .sectionContent { margin-top: 8px !important; }
+  .hint { font-size: 13px; line-height: 1.45; }
+
+  label {
+    font-size: 13px !important;
+    margin: 0 0 4px !important;
+  }
+  input, select, textarea {
+    min-height: 42px !important;
+    font-size: 16px !important;
+    padding: 8px 10px !important;
+    border-radius: 12px !important;
+  }
+  textarea { min-height: 72px !important; }
+
+  table, thead, tbody, tr, td, th { width: 100%; }
+  table { display: block; }
+  thead { display: none; }
+  tbody { display: block; }
+
+  /* 每個品項改成緊湊卡片 */
+  tr {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 10px;
+    padding: 10px !important;
+    margin-bottom: 8px !important;
+    border: 1px solid var(--line) !important;
+    border-radius: 14px !important;
+    background: #fffdfa !important;
+  }
+  td {
+    display: block !important;
+    border: none !important;
+    padding: 0 !important;
+  }
+  td::before {
+    content: attr(data-label);
+    display: block;
+    font-size: 12px !important;
+    color: var(--muted);
+    font-weight: 800;
+    margin-bottom: 3px;
+  }
+  td.item-name {
+    grid-column: 1 / -1;
+    font-size: 16px !important;
+    line-height: 1.2;
+    padding-bottom: 2px !important;
+  }
+  td.item-name::before { display: none !important; }
+
+  td input, td select {
+    min-height: 38px !important;
+    font-size: 15px !important;
+    padding: 7px 9px !important;
+    border-radius: 10px !important;
+  }
+  .prev, .prevQty, .diffQty {
+    font-size: 12px !important;
+    line-height: 1.35 !important;
+    margin-top: 3px !important;
+    margin-bottom: 0 !important;
+  }
+
+  /* 賣出顆數：單位欄較窄 */
+  #salesTable tr {
+    grid-template-columns: 1fr 86px;
+  }
+  #salesTable td.item-name { grid-column: 1 / -1; }
+  #salesTable td[data-label="賣出數"] { grid-column: 1 / 2; }
+  #salesTable td[data-label="單位"] { grid-column: 2 / 3; align-self: end; font-weight: 800; }
+
+  /* 效期品：品項、效期、數量、狀態用兩欄 */
+  #expiryTable tr { grid-template-columns: 1fr 1fr; }
+  #expiryTable td[data-label="品項"] { grid-column: 1 / -1; }
+  #expiryTable td[data-label="狀態"] select { min-height: 38px !important; }
+
+  /* 基本資料與業績區再壓縮 */
+  .grid, .grid-2 { gap: 10px !important; }
+  .actions {
+    padding: 8px 10px calc(8px + env(safe-area-inset-bottom)) !important;
+    border-top: 1px solid var(--line);
+  }
+  .toggleActions {
+    min-height: 44px !important;
+    border-radius: 18px !important;
+    font-size: 16px !important;
+    margin-bottom: 0 !important;
+  }
+  .actionButtons { margin-top: 8px; }
+  .actionButtons button { min-height: 42px !important; padding: 9px 12px !important; }
+
+  /* 收合狀態卡片更薄 */
+  .collapsible.closed { padding-top: 13px !important; padding-bottom: 13px !important; }
+  .collapsible.closed h2 { margin-bottom: 0 !important; }
+}
+
   </style>
 </head>
 <body>
@@ -573,6 +692,28 @@ function loadDraft(){
     console.warn(e);
   }
 }
+
+
+function fillFormData(data){
+  if(!data) return;
+  const set = (id, value) => {
+    const el = document.getElementById(id);
+    if(el && value !== undefined && value !== null) el.value = value;
+  };
+  set("store", data.store);
+  set("date", data.date);
+  set("time", data.time);
+  set("staff", data.staff);
+  set("dailyRevenue", data.dailyRevenue);
+  set("totalRevenue", data.totalRevenue);
+  set("notes", data.notes);
+  if(data.output && document.getElementById("output")) document.getElementById("output").textContent = data.output;
+}
+
+document.addEventListener("input", () => {
+  try { autoSaveDraft(); } catch(e) {}
+});
+
     function toggleSection(el){
 
   const section = el.closest(".collapsible");
