@@ -16,8 +16,11 @@
     main { max-width:980px; margin:0 auto; padding:18px; }
     .card { background:var(--card); border:1px solid var(--line); border-radius:18px; padding:18px; margin-bottom:16px; box-shadow:0 8px 24px rgba(122,75,32,.06); }
     .card h2 { margin:0 0 14px; font-size:18px; color:var(--main-dark); display:flex; align-items:center; gap:6px; }
-    .grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
-    .grid-2 { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
+.grid {
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px;
+}    .grid-2 { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
     label { display:block; font-size:13px; font-weight:700; color:var(--muted); margin-bottom:4px; }
     input, select, textarea { width:100%; border:1px solid var(--line); border-radius:12px; padding:10px 12px; font-size:16px; background:#fffdfa; color:var(--text); outline:none; }
     input:focus, select:focus, textarea:focus { border-color:var(--main); box-shadow:0 0 0 3px rgba(183,121,53,.14); }
@@ -37,7 +40,13 @@
     .output { white-space:pre-wrap; background:#20160f; color:#fff7ed; border-radius:16px; padding:16px; font-size:14px; min-height:220px; overflow-x:auto; }
     .hint { color:var(--muted); font-size:13px; margin-top:8px; }
     .pill { display:inline-block; padding:2px 8px; border-radius:999px; background:#fff2dc; color:var(--main-dark); font-size:12px; margin-left:4px; }
-    @media (max-width:760px) { header h1{font-size:21px;} main{padding:14px;} .grid,.grid-2{grid-template-columns:1fr;} .card{padding:14px;border-radius:16px;} table,thead,tbody,th,td,tr{display:block;} thead{display:none;} tr{border:1px solid var(--line); border-radius:14px; padding:10px; margin-bottom:10px; background:#fffdfa;} td{border:none; padding:5px 0;} td::before{content:attr(data-label); display:block; font-size:12px; color:var(--muted); font-weight:800; margin-bottom:2px;} .item-name::before{display:none;} .actions{grid-template-columns:1fr; padding:10px 14px 14px;} }
+    @media (max-width:760px) { header h1{font-size:21px;} main{padding:14px;} .grid{
+  grid-template-columns:1fr 1fr !important;
+}
+
+.grid-2{
+  grid-template-columns:1fr 1fr !important;
+} .card{padding:14px;border-radius:16px;} table,thead,tbody,th,td,tr{display:block;} thead{display:none;} tr{border:1px solid var(--line); border-radius:14px; padding:10px; margin-bottom:10px; background:#fffdfa;} td{border:none; padding:5px 0;} td::before{content:attr(data-label); display:block; font-size:12px; color:var(--muted); font-weight:800; margin-bottom:2px;} .item-name::before{display:none;} .actions{grid-template-columns:1fr; padding:10px 14px 14px;} }
 
     .toggleActions {
   display: none;
@@ -231,9 +240,9 @@ textarea{
     margin: 0 0 4px !important;
   }
   input, select, textarea {
-    min-height: 42px !important;
+min-height: 38px !important;
     font-size: 16px !important;
-    padding: 8px 10px !important;
+padding: 6px 10px !important;
     border-radius: 12px !important;
   }
   textarea { min-height: 72px !important; }
