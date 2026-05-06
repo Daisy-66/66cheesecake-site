@@ -87,6 +87,8 @@ const expiryDefault = [
   "巧克力卡士達",
   "迷你派原味卡士達",
   "泡芙殼",
+  "巧克力醬",
+  "迷你派餅皮",
   "曲奇餅乾",
   "丹麥卷原味",
   "丹麥卷咖啡",
@@ -254,7 +256,7 @@ if(Array.isArray(data.incomingRows)){
           const yesterdayRow = document.querySelector(`#yesterdayTable tr[data-name="${item.name}"]`);
           if(yesterdayRow){
             const el = yesterdayRow.querySelector(".prev");
-            if(el){ el.textContent = `昨日今日剩餘：${item.qty || "-"}${noteText}`; shownCount++; }
+            if(el){ el.textContent = `昨日剩餘：${item.qty || "-"}${noteText}`; shownCount++; }
           }
 
         const todayRow = document.querySelector(`#todayTable tr[data-name="${item.name}"]`);
