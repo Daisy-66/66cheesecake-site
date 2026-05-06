@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
@@ -86,6 +87,40 @@
 .collapsible.closed .sectionContent{
   display:none;
 }
+  
+
+/* ===== 手機版精簡美化 ===== */
+.collapsible h2{ cursor:pointer; user-select:none; }
+.sectionContent{ margin-top:12px; }
+.collapsible.closed .sectionContent{ display:none; }
+
+@media (max-width:760px){
+  body{ background:#fff8ef; font-size:14px; padding-bottom:74px; }
+  header{ padding:22px 20px 18px; position:relative; }
+  header h1{ font-size:26px; line-height:1.18; }
+  header p{ font-size:15px; }
+  main{ padding:10px 14px 18px; }
+  .card{ padding:14px; margin-bottom:10px; border-radius:18px; box-shadow:0 4px 14px rgba(122,75,32,.05); }
+  .card h2{ font-size:20px; margin:0; line-height:1.25; }
+  .sectionContent{ margin-top:12px; }
+  label{ font-size:14px; margin-bottom:5px; }
+  input, select, textarea{ font-size:16px; padding:10px 12px; min-height:44px; border-radius:12px; }
+  table, thead, tbody, th, td, tr{ display:block; width:100%; }
+  thead{ display:none; }
+  tr{ border:1px solid var(--line); border-radius:16px; padding:12px; margin-bottom:10px; background:#fffdfa; }
+  td{ border:none; padding:5px 0; }
+  td::before{ content:attr(data-label); display:block; font-size:12px; color:var(--muted); font-weight:800; margin-bottom:3px; }
+  .item-name{ font-size:16px; margin-bottom:6px; }
+  .item-name::before{ display:none; }
+  .prev, .prevQty{ font-size:12px; margin-top:3px; }
+  .diffQty{ font-size:13px; }
+  .output{ min-height:140px; font-size:13px; }
+  .actions{ position:fixed; left:0; right:0; bottom:0; z-index:30; max-width:none; padding:8px 12px calc(8px + env(safe-area-inset-bottom)); border-top:1px solid var(--line); display:block; }
+  .toggleActions{ display:block; width:100%; margin:0; background:#7a4b20; color:#fff; padding:12px; font-size:16px; border-radius:18px; }
+  .actionButtons{ display:none; grid-template-columns:1fr; gap:8px; margin-top:8px; }
+  .actions.open .actionButtons{ display:grid; }
+}
+
   </style>
 </head>
 <body>
@@ -111,23 +146,65 @@
       <p class="hint" id="revenueHint">請直接填當日業績，系統會抓同門市本月前面日期累計後自動加總。</p>
     </section>
 
-   <section class="card"><h2>③ 賣出顆數 / 份數</h2><table id="salesTable"><thead><tr><th>品項</th><th>賣出數</th><th>單位</th></tr></thead><tbody></tbody></table></section>
-<section class="card collapsible">
-<h2 onclick="toggleSection(this)">▼ ④ 昨日剩餘「泡芙、迷你派」數</h2>
-<div class="sectionContent"><button class="secondary" type="button" onclick="loadPreviousDayStock()">顯示前一天數量</button><p class="hint" id="previousHint">尚未讀取前一天資料。</p><table id="yesterdayTable"><thead><tr><th>品項</th><th>數量</th><th>箱數 / 備註</th></tr></thead><tbody></tbody></table></div></section>
-<section class="card collapsible">
-<h2 onclick="toggleSection(this)">▼ ⑤ 今日烤 / 進貨數</h2>
-<div class="sectionContent"><table id="incomingTable"><thead><tr><th>品項</th><th>數量</th><th>備註</th></tr></thead><tbody></tbody></table></div></section>
-<h2 onclick="toggleSection(this)">▼ ⑥ 今日剩餘「泡芙、迷你派」數</h2>
-<div class="sectionContent"></div><table id="todayTable"><thead><tr><th>品項</th><th>數量</th><th>箱數 / 備註</th></tr></thead><tbody></tbody></table></section>
-    <section class="card collapsible">
-<h2 onclick="toggleSection(this)">▼ ⑦ 效期品庫存 <span class="pill">可填多筆</span></h2>
-<div class="sectionContent"></div> <span class="pill">可填多筆</span></h2><table id="expiryTable"><thead><tr><th>品項</th><th>效期</th><th>數量</th><th>狀態</th></tr></thead><tbody></tbody></table><button class="secondary" type="button" onclick="addExpiryRow()">＋新增效期品</button><p class="hint">狀態可選：正常、即期、今日到期、售完。</p></section>
-    <section class="card collapsible">
-<h2 onclick="toggleSection(this)">▼ ⑧ 備品庫存</h2>
-<div class="sectionContent"></div><table id="suppliesTable"><thead><tr><th>品項</th><th>前場</th><th>後場 / 箱子</th><th>狀態</th></tr></thead><tbody></tbody></table></section>
-    <section class="card"><h2>⑨ 其他備註</h2><textarea id="notes" placeholder="例如：草莓泡芙做泡芙殼3.5箱、後面大冰箱、異常狀況等"></textarea></section>
-    <section class="card"><h2>LINE 回報文字</h2><div id="output" class="output">按下「產生回報」後，這裡會出現整理好的盤點文字。</div></section>
+   <section class="card collapsible closed">
+      <h2 onclick="toggleSection(this)">▶ ③ 賣出顆數 / 份數</h2>
+      <div class="sectionContent">
+        <table id="salesTable"><thead><tr><th>品項</th><th>賣出數</th><th>單位</th></tr></thead><tbody></tbody></table>
+      </div>
+    </section>
+
+    <section class="card collapsible closed">
+      <h2 onclick="toggleSection(this)">▶ ④ 昨日剩餘「泡芙、迷你派」數</h2>
+      <div class="sectionContent">
+        <button class="secondary" type="button" onclick="loadPreviousDayStock()">顯示前一天數量</button>
+        <p class="hint" id="previousHint">尚未讀取前一天資料。</p>
+        <table id="yesterdayTable"><thead><tr><th>品項</th><th>數量</th><th>箱數 / 備註</th></tr></thead><tbody></tbody></table>
+      </div>
+    </section>
+
+    <section class="card collapsible closed">
+      <h2 onclick="toggleSection(this)">▶ ⑤ 今日烤 / 進貨數</h2>
+      <div class="sectionContent">
+        <table id="incomingTable"><thead><tr><th>品項</th><th>數量</th><th>備註</th></tr></thead><tbody></tbody></table>
+      </div>
+    </section>
+
+    <section class="card collapsible closed">
+      <h2 onclick="toggleSection(this)">▶ ⑥ 今日剩餘「泡芙、迷你派」數</h2>
+      <div class="sectionContent">
+        <table id="todayTable"><thead><tr><th>品項</th><th>數量</th><th>箱數 / 備註</th></tr></thead><tbody></tbody></table>
+      </div>
+    </section>
+
+    <section class="card collapsible closed">
+      <h2 onclick="toggleSection(this)">▶ ⑦ 效期品庫存 <span class="pill">可填多筆</span></h2>
+      <div class="sectionContent">
+        <table id="expiryTable"><thead><tr><th>品項</th><th>效期</th><th>數量</th><th>狀態</th></tr></thead><tbody></tbody></table>
+        <button class="secondary" type="button" onclick="addExpiryRow()">＋新增效期品</button>
+        <p class="hint">狀態可選：正常、即期、今日到期、售完。</p>
+      </div>
+    </section>
+
+    <section class="card collapsible closed">
+      <h2 onclick="toggleSection(this)">▶ ⑧ 備品庫存</h2>
+      <div class="sectionContent">
+        <table id="suppliesTable"><thead><tr><th>品項</th><th>前場</th><th>後場 / 箱子</th><th>狀態</th></tr></thead><tbody></tbody></table>
+      </div>
+    </section>
+
+    <section class="card collapsible closed">
+      <h2 onclick="toggleSection(this)">▶ ⑨ 其他備註</h2>
+      <div class="sectionContent">
+        <textarea id="notes" placeholder="例如：草莓泡芙做泡芙殼3.5箱、後面大冰箱、異常狀況等"></textarea>
+      </div>
+    </section>
+
+    <section class="card collapsible closed">
+      <h2 onclick="toggleSection(this)">▶ LINE 回報文字</h2>
+      <div class="sectionContent">
+        <div id="output" class="output">按下「產生回報」後，這裡會出現整理好的盤點文字。</div>
+      </div>
+    </section>
   </main>
 
 <div class="actions" id="actionBar">
@@ -244,6 +321,7 @@ function extractNumber(text){
 
       document.querySelectorAll(".prev").forEach(el => el.textContent = "昨日：-");
       document.querySelectorAll(".diffQty").forEach(el => el.textContent = "");
+      document.querySelectorAll("#expiryTable tbody tr").forEach(row => delete row.dataset.filledFromYesterday);
 
       if(!data){
         if(hint) hint.textContent = `找不到 ${prevDate} ${store} 的前一天資料`;
@@ -261,63 +339,34 @@ function extractNumber(text){
         });
       }
 
-  if(Array.isArray(data.yesterdayRows)){
-  data.yesterdayRows.forEach(item => {
-    const row = document.querySelector(`#yesterdayTable tr[data-name="${item.name}"]`);
-    if(!row) return;
+      if(Array.isArray(data.yesterdayRows)){
+        data.yesterdayRows.forEach(item => {
+          const row = document.querySelector(`#yesterdayTable tr[data-name="${item.name}"]`);
+          if(!row) return;
+          const el = row.querySelector(".prev");
+          const noteText = item.note ? `（${item.note}）` : "";
+          if(el){ el.textContent = `昨日：${item.qty || "-"}${noteText}`; shownCount++; }
+          const qtyInput = row.querySelector(".yesterdayQty");
+          if(qtyInput && !qtyInput.value) qtyInput.value = item.qty || "";
+          const noteInput = row.querySelector(".yesterdayNote");
+          if(noteInput && !noteInput.value) noteInput.value = item.note || "";
+        });
+      }
 
-    const el = row.querySelector(".prev");
-    const noteText = item.note ? `（${item.note}）` : "";
+      if(Array.isArray(data.incomingRows)){
+        data.incomingRows.forEach(item => {
+          const row = document.querySelector(`#incomingTable tr[data-name="${item.name}"]`);
+          if(!row) return;
+          const el = row.querySelector(".prev");
+          const noteText = item.note ? `（${item.note}）` : "";
+          if(el){ el.textContent = `昨日：${item.qty || "-"}${noteText}`; shownCount++; }
+          const qtyInput = row.querySelector(".incomingQty");
+          if(qtyInput && !qtyInput.value) qtyInput.value = item.qty || "";
+          const noteInput = row.querySelector(".incomingNote");
+          if(noteInput && !noteInput.value) noteInput.value = item.note || "";
+        });
+      }
 
-    if(el){
-      el.textContent = `昨日：${item.qty || "-"}${noteText}`;
-      shownCount++;
-    }
-
-    const qtyInput = row.querySelector(".yesterdayQty");
-    if(qtyInput && !qtyInput.value){
-      qtyInput.value = item.qty || "";
-    }
-
-    const noteInput = row.querySelector(".yesterdayNote");
-    if(noteInput && !noteInput.value){
-      noteInput.value = item.note || "";
-    }
-  });
-}
-
-if(Array.isArray(data.incomingRows)){
-  data.incomingRows.forEach(item => {
-
-    const row = document.querySelector(`#incomingTable tr[data-name="${item.name}"]`);
-
-    if(!row) return;
-
-    const el = row.querySelector(".prev");
-
-    const noteText = item.note ? `（${item.note}）` : "";
-
-    if(el){
-      el.textContent = `昨日：${item.qty || "-"}${noteText}`;
-      shownCount++;
-    }
-
-    // ===== 自動帶入數量 =====
-    const qtyInput = row.querySelector(".incomingQty");
-
-    if(qtyInput && !qtyInput.value){
-      qtyInput.value = item.qty || "";
-    }
-
-    // ===== 自動帶入備註 =====
-    const noteInput = row.querySelector(".incomingNote");
-
-    if(noteInput && !noteInput.value){
-      noteInput.value = item.note || "";
-    }
-
-  });
-}
       if(Array.isArray(data.todayStockRows)){
         data.todayStockRows.forEach(item => {
           const noteText = item.note ? `（${item.note}）` : "";
@@ -328,142 +377,74 @@ if(Array.isArray(data.incomingRows)){
             if(el){ el.textContent = `昨日剩餘：${item.qty || "-"}${noteText}`; shownCount++; }
           }
 
-        const todayRow = document.querySelector(`#todayTable tr[data-name="${item.name}"]`);
+          const todayRow = document.querySelector(`#todayTable tr[data-name="${item.name}"]`);
+          if(todayRow){
+            const el = todayRow.querySelector(".prev");
+            if(el){ el.textContent = `昨日：${item.qty || "-"}${noteText}`; shownCount++; }
 
-if(todayRow){
+            const qtyInput = todayRow.querySelector(".todayQty");
+            if(qtyInput && !qtyInput.value) qtyInput.value = item.qty || "";
 
-  const el = todayRow.querySelector(".prev");
+            const noteInput = todayRow.querySelector(".todayNote");
+            if(noteInput && !noteInput.value) noteInput.value = item.note || "";
 
-  if(el){
-    el.textContent = `昨日：${item.qty || "-"}${noteText}`;
-    shownCount++;
-  }
-
-  const qtyInput = todayRow.querySelector(".todayQty");
-  if(qtyInput && !qtyInput.value){
-    qtyInput.value = item.qty || "";
-  }
-
-  const noteInput = todayRow.querySelector(".todayNote");
-  if(noteInput && !noteInput.value){
-    noteInput.value = item.note || "";
-  }
-
-  renderDiff(todayRow, ".todayQty", item.qty);
-}
-
-// 自動帶入昨日數量
-const qtyInput = todayRow.querySelector(".todayQty");
-
-if(qtyInput && !qtyInput.value){
-  qtyInput.value = item.qty || "";
-}
-
-renderDiff(todayRow, ".todayQty", item.qty);
+            renderDiff(todayRow, ".todayQty", item.qty);
+          }
         });
       }
 
-if(Array.isArray(data.expiryRows)){
-  data.expiryRows.forEach(item => {
+      if(Array.isArray(data.expiryRows)){
+        data.expiryRows.forEach(item => {
+          let row = [...document.querySelectorAll("#expiryTable tbody tr")]
+            .find(r => r.querySelector(".expiryName")?.value === item.name && !r.dataset.filledFromYesterday);
 
-    let row = [...document.querySelectorAll("#expiryTable tbody tr")]
-      .find(r =>
-        r.querySelector(".expiryName")?.value === item.name &&
-        !r.dataset.filledFromYesterday
-      );
+          if(!row){
+            addExpiryRow(item.name);
+            const rows = [...document.querySelectorAll("#expiryTable tbody tr")];
+            row = rows[rows.length - 1];
+          }
 
-    // 同品項多效期時自動新增列
-    if(!row){
+          row.dataset.filledFromYesterday = "true";
+          const el = row.querySelector(".prev");
+          if(el){
+            el.textContent = `昨日：${item.dateText || ""}${item.qty ? "*" + item.qty : ""}${item.status && item.status !== "正常" ? "（" + item.status + "）" : ""}`;
+            shownCount++;
+          }
 
-      addExpiryRow(item.name);
+          const nameInput = row.querySelector(".expiryName");
+          if(nameInput && !nameInput.value) nameInput.value = item.name || "";
+          const dateInput = row.querySelector(".expiryDate");
+          if(dateInput && !dateInput.value) dateInput.value = item.dateText || "";
+          const qtyInput = row.querySelector(".expiryQty");
+          if(qtyInput && !qtyInput.value) qtyInput.value = item.qty || "";
+          const statusInput = row.querySelector(".expiryStatus");
+          if(statusInput && item.status) statusInput.value = item.status;
+        });
+      }
 
-      const rows = [...document.querySelectorAll("#expiryTable tbody tr")];
+      if(Array.isArray(data.supplyRows)){
+        data.supplyRows.forEach(item => {
+          const row = document.querySelector(`#suppliesTable tr[data-name="${item.name}"]`);
+          if(!row) return;
+          const el = row.querySelector(".prev");
+          const parts = [];
+          if(item.front) parts.push(`前場${item.front}`);
+          if(item.back) parts.push(`後場${item.back}`);
+          if(item.status && item.status !== "正常") parts.push(item.status);
+          if(el){ el.textContent = `昨日：${parts.length ? parts.join("，") : "-"}`; shownCount++; }
+          const frontInput = row.querySelector(".supplyFront");
+          if(frontInput && !frontInput.value) frontInput.value = item.front || "";
+          const backInput = row.querySelector(".supplyBack");
+          if(backInput && !backInput.value) backInput.value = item.back || "";
+          const statusInput = row.querySelector(".supplyStatus");
+          if(statusInput && item.status) statusInput.value = item.status;
+        });
+      }
 
-      row = rows[rows.length - 1];
-    }
-
-    row.dataset.filledFromYesterday = "true";
-
-    const el = row.querySelector(".prev");
-
-    if(el){
-      el.textContent =
-        `昨日：${item.dateText || ""}${item.qty ? "*" + item.qty : ""}${item.status && item.status !== "正常" ? "（" + item.status + "）" : ""}`;
-
-      shownCount++;
-    }
-
-    // 品項
-    const nameInput = row.querySelector(".expiryName");
-
-    if(nameInput && !nameInput.value){
-      nameInput.value = item.name || "";
-    }
-
-    // 效期
-    const dateInput = row.querySelector(".expiryDate");
-
-    if(dateInput && !dateInput.value){
-      dateInput.value = item.dateText || "";
-    }
-
-    // 數量
-    const qtyInput = row.querySelector(".expiryQty");
-
-    if(qtyInput && !qtyInput.value){
-      qtyInput.value = item.qty || "";
-    }
-
-    // 狀態
-    const statusInput = row.querySelector(".expiryStatus");
-
-    if(statusInput && item.status){
-      statusInput.value = item.status;
-    }
-
-  });
-}
-
-if(Array.isArray(data.supplyRows)){
-  data.supplyRows.forEach(item => {
-    const row = document.querySelector(`#suppliesTable tr[data-name="${item.name}"]`);
-    if(!row) return;
-
-    const el = row.querySelector(".prev");
-
-    const parts = [];
-    if(item.front) parts.push(`前場${item.front}`);
-    if(item.back) parts.push(`後場${item.back}`);
-    if(item.status && item.status !== "正常") parts.push(item.status);
-
-    if(el){
-      el.textContent = `昨日：${parts.length ? parts.join("，") : "-"}`;
-      shownCount++;
-    }
-
-    const frontInput = row.querySelector(".supplyFront");
-    if(frontInput && !frontInput.value){
-      frontInput.value = item.front || "";
-    }
-
-    const backInput = row.querySelector(".supplyBack");
-    if(backInput && !backInput.value){
-      backInput.value = item.back || "";
-    }
-
-    const statusInput = row.querySelector(".supplyStatus");
-    if(statusInput && item.status){
-      statusInput.value = item.status;
-    }
-  });
-}
-const realDate = data?.date || prevDate;
-
-if(hint){
-  hint.textContent = shownCount 
-    ? `已顯示 ${realDate} ${store} 的完整前一天資料` 
-    : `找不到 ${realDate} ${store} 的前一天資料`;
-}
+      const realDate = data?.date || prevDate;
+      if(hint){
+        hint.textContent = shownCount ? `已顯示 ${realDate} ${store} 的完整前一天資料` : `找不到 ${realDate} ${store} 的前一天資料`;
+      }
     }
 
     function collectSalesRows(){ return [...document.querySelectorAll("#salesTable tbody tr")].map(row => ({ name: row.dataset.name, unit: row.dataset.unit, qty: rowValue(row,".salesQty") })).filter(item => item.qty); }
