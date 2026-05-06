@@ -190,26 +190,63 @@ function extractNumber(text){
         });
       }
 
-      if(Array.isArray(data.yesterdayRows)){
-        data.yesterdayRows.forEach(item => {
-          const row = document.querySelector(`#yesterdayTable tr[data-name="${item.name}"]`);
-          if(!row) return;
-          const el = row.querySelector(".prev");
-          const noteText = item.note ? `（${item.note}）` : "";
-          if(el){ el.textContent = `昨日：${item.qty || "-"}${noteText}`; shownCount++; }
-        });
-      }
+  if(Array.isArray(data.yesterdayRows)){
+  data.yesterdayRows.forEach(item => {
+    const row = document.querySelector(`#yesterdayTable tr[data-name="${item.name}"]`);
+    if(!row) return;
 
-      if(Array.isArray(data.incomingRows)){
-        data.incomingRows.forEach(item => {
-          const row = document.querySelector(`#incomingTable tr[data-name="${item.name}"]`);
-          if(!row) return;
-          const el = row.querySelector(".prev");
-          const noteText = item.note ? `（${item.note}）` : "";
-          if(el){ el.textContent = `昨日：${item.qty || "-"}${noteText}`; shownCount++; }
-        });
-      }
+    const el = row.querySelector(".prev");
+    const noteText = item.note ? `（${item.note}）` : "";
 
+    if(el){
+      el.textContent = `昨日：${item.qty || "-"}${noteText}`;
+      shownCount++;
+    }
+
+    const qtyInput = row.querySelector(".yesterdayQty");
+    if(qtyInput && !qtyInput.value){
+      qtyInput.value = item.qty || "";
+    }
+
+    const noteInput = row.querySelector(".yesterdayNote");
+    if(noteInput && !noteInput.value){
+      noteInput.value = item.note || "";
+    }
+  });
+}
+
+if(Array.isArray(data.incomingRows)){
+  data.incomingRows.forEach(item => {
+
+    const row = document.querySelector(`#incomingTable tr[data-name="${item.name}"]`);
+
+    if(!row) return;
+
+    const el = row.querySelector(".prev");
+
+    const noteText = item.note ? `（${item.note}）` : "";
+
+    if(el){
+      el.textContent = `昨日：${item.qty || "-"}${noteText}`;
+      shownCount++;
+    }
+
+    // ===== 自動帶入數量 =====
+    const qtyInput = row.querySelector(".incomingQty");
+
+    if(qtyInput && !qtyInput.value){
+      qtyInput.value = item.qty || "";
+    }
+
+    // ===== 自動帶入備註 =====
+    const noteInput = row.querySelector(".incomingNote");
+
+    if(noteInput && !noteInput.value){
+      noteInput.value = item.note || "";
+    }
+
+  });
+}
       if(Array.isArray(data.todayStockRows)){
         data.todayStockRows.forEach(item => {
           const noteText = item.note ? `（${item.note}）` : "";
@@ -231,15 +268,17 @@ if(todayRow){
     shownCount++;
   }
 
-  // 自動帶入昨日數量
   const qtyInput = todayRow.querySelector(".todayQty");
-
   if(qtyInput && !qtyInput.value){
     qtyInput.value = item.qty || "";
   }
 
-  renderDiff(todayRow, ".todayQty", item.qty);
+  const noteInput = todayRow.querySelector(".todayNote");
+  if(noteInput && !noteInput.value){
+    noteInput.value = item.note || "";
+  }
 
+  renderDiff(todayRow, ".todayQty", item.qty);
 }
 
 // 自動帶入昨日數量
@@ -253,29 +292,70 @@ renderDiff(todayRow, ".todayQty", item.qty);
         });
       }
 
-      if(Array.isArray(data.expiryRows)){
-        data.expiryRows.forEach(item => {
-          const row = [...document.querySelectorAll("#expiryTable tbody tr")]
-            .find(r => r.querySelector(".expiryName")?.value === item.name);
-          if(!row) return;
-          const el = row.querySelector(".prev");
-          if(el){ el.textContent = `昨日：${item.dateText || ""}${item.qty ? "*" + item.qty : ""}${item.status && item.status !== "正常" ? "（" + item.status + "）" : ""}`; shownCount++; }
-        });
-      }
+  if(Array.isArray(data.expiryRows)){
+  data.expiryRows.forEach(item => {
+    const row = [...document.querySelectorAll("#expiryTable tbody tr")]
+      .find(r => r.querySelector(".expiryName")?.value === item.name);
 
-      if(Array.isArray(data.supplyRows)){
-        data.supplyRows.forEach(item => {
-          const row = document.querySelector(`#suppliesTable tr[data-name="${item.name}"]`);
-          if(!row) return;
-          const el = row.querySelector(".prev");
-          const parts = [];
-          if(item.front) parts.push(`前場${item.front}`);
-          if(item.back) parts.push(`後場${item.back}`);
-          if(item.status && item.status !== "正常") parts.push(item.status);
-          if(el){ el.textContent = `昨日：${parts.length ? parts.join("，") : "-"}`; shownCount++; }
-        });
-      }
+    if(!row) return;
 
+    const el = row.querySelector(".prev");
+
+    if(el){
+      el.textContent = `昨日：${item.dateText || ""}${item.qty ? "*" + item.qty : ""}${item.status && item.status !== "正常" ? "（" + item.status + "）" : ""}`;
+      shownCount++;
+    }
+
+    const dateInput = row.querySelector(".expiryDate");
+    if(dateInput && !dateInput.value){
+      dateInput.value = item.dateText || "";
+    }
+
+    const qtyInput = row.querySelector(".expiryQty");
+    if(qtyInput && !qtyInput.value){
+      qtyInput.value = item.qty || "";
+    }
+
+    const statusInput = row.querySelector(".expiryStatus");
+    if(statusInput && item.status){
+      statusInput.value = item.status;
+    }
+  });
+}
+
+if(Array.isArray(data.supplyRows)){
+  data.supplyRows.forEach(item => {
+    const row = document.querySelector(`#suppliesTable tr[data-name="${item.name}"]`);
+    if(!row) return;
+
+    const el = row.querySelector(".prev");
+
+    const parts = [];
+    if(item.front) parts.push(`前場${item.front}`);
+    if(item.back) parts.push(`後場${item.back}`);
+    if(item.status && item.status !== "正常") parts.push(item.status);
+
+    if(el){
+      el.textContent = `昨日：${parts.length ? parts.join("，") : "-"}`;
+      shownCount++;
+    }
+
+    const frontInput = row.querySelector(".supplyFront");
+    if(frontInput && !frontInput.value){
+      frontInput.value = item.front || "";
+    }
+
+    const backInput = row.querySelector(".supplyBack");
+    if(backInput && !backInput.value){
+      backInput.value = item.back || "";
+    }
+
+    const statusInput = row.querySelector(".supplyStatus");
+    if(statusInput && item.status){
+      statusInput.value = item.status;
+    }
+  });
+}
 const realDate = data?.date || prevDate;
 
 if(hint){
