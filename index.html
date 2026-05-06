@@ -252,9 +252,13 @@ function extractNumber(text){
         });
       }
 
-      if(hint){
-        hint.textContent = shownCount ? `已顯示 ${prevDate} ${store} 的完整前一天資料` : `找不到 ${prevDate} ${store} 的前一天資料`;
-      }
+const realDate = data?.date || prevDate;
+
+if(hint){
+  hint.textContent = shownCount 
+    ? `已顯示 ${realDate} ${store} 的完整前一天資料` 
+    : `找不到 ${realDate} ${store} 的前一天資料`;
+}
     }
 
     function collectSalesRows(){ return [...document.querySelectorAll("#salesTable tbody tr")].map(row => ({ name: row.dataset.name, unit: row.dataset.unit, qty: rowValue(row,".salesQty") })).filter(item => item.qty); }
