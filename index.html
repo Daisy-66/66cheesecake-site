@@ -354,6 +354,39 @@ ${notes}` : "" ].filter(Boolean).join("\n");
     }
     function init(){ document.getElementById("date").value = todayISO(); document.getElementById("time").value = nowTime(); renderSales(); renderSimpleStock("yesterdayTable", stockItems, "yesterdayQty", "yesterdayNote", true); renderSimpleStock("incomingTable", incomingItems, "incomingQty", "incomingNote", false); renderSimpleStock("todayTable", stockItems, "todayQty", "todayNote", false); renderExpiryDefaults(); renderSupplies(); setupDiffListeners(); setTimeout(() => { loadPreviousDayStock(); updateRevenueHint(); }, 100); }
     init();
+    loadDraft();
+    // ===== 自動儲存草稿 =====
+
+function autoSaveDraft(){
+
+  const data = collectFormData();
+
+  localStorage.setItem(
+    "inventory_draft",
+    JSON.stringify(data)
+  );
+
+  console.log("已自動儲存");
+}
+
+function loadDraft(){
+
+  const raw = localStorage.getItem("inventory_draft");
+
+  if(!raw) return;
+
+  try{
+
+    const data = JSON.parse(raw);
+
+    fillFormData(data);
+
+    console.log("已載入草稿");
+
+  }catch(e){
+    console.warn(e);
+  }
+}
   </script>
 </body>
 </html>
