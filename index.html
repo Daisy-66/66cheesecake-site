@@ -220,10 +220,26 @@ function extractNumber(text){
             if(el){ el.textContent = `昨日今日剩餘：${item.qty || "-"}${noteText}`; shownCount++; }
           }
 
-          const todayRow = document.querySelector(`#todayTable tr[data-name="${item.name}"]`);
-          if(el){
-  el.textContent = `昨日：${item.qty || "-"}${noteText}`;
-  shownCount++;
+        const todayRow = document.querySelector(`#todayTable tr[data-name="${item.name}"]`);
+
+if(todayRow){
+
+  const el = todayRow.querySelector(".prev");
+
+  if(el){
+    el.textContent = `昨日：${item.qty || "-"}${noteText}`;
+    shownCount++;
+  }
+
+  // 自動帶入昨日數量
+  const qtyInput = todayRow.querySelector(".todayQty");
+
+  if(qtyInput && !qtyInput.value){
+    qtyInput.value = item.qty || "";
+  }
+
+  renderDiff(todayRow, ".todayQty", item.qty);
+
 }
 
 // 自動帶入昨日數量
