@@ -221,11 +221,19 @@ function extractNumber(text){
           }
 
           const todayRow = document.querySelector(`#todayTable tr[data-name="${item.name}"]`);
-          if(todayRow){
-            const el = todayRow.querySelector(".prev");
-            if(el){ el.textContent = `昨日：${item.qty || "-"}${noteText}`; shownCount++; }
-            renderDiff(todayRow, ".todayQty", item.qty);
-          }
+          if(el){
+  el.textContent = `昨日：${item.qty || "-"}${noteText}`;
+  shownCount++;
+}
+
+// 自動帶入昨日數量
+const qtyInput = todayRow.querySelector(".todayQty");
+
+if(qtyInput && !qtyInput.value){
+  qtyInput.value = item.qty || "";
+}
+
+renderDiff(todayRow, ".todayQty", item.qty);
         });
       }
 
