@@ -123,14 +123,55 @@ const expiryDefault = [
     function stockStorageKey(store,date){ return `inventoryStock:${store}:${date}`; }
     function saveTodayStockLocal(){ const store = document.getElementById("store").value; const date = document.getElementById("date").value; if(!store || !date) return; localStorage.setItem(stockStorageKey(store,date), JSON.stringify(getTodayStockRows())); }
 
-    async function loadPreviousDayStock(){ const store = document.getElementById("store").value; const date = document.getElementById("date").value; const hint = document.getElementById("previousHint"); if(!store || !date) return; const prevDate = previousDateISO(date); let previousRows = []; let sourceText = "";
-      try{ const result = await apiPost("getPreviousStock", { store, date }); if(result && result.ok && Array.isArray(result.rows) && result.rows.length){ previousRows = result.rows; sourceText = "Google Sheets"; } }catch(error){ console.warn("Google Sheets 讀取失敗，改用本機資料", error); }
-      if(!previousRows.length){ const raw = localStorage.getItem(stockStorageKey(store, prevDate)); if(raw){ previousRows = JSON.parse(raw); sourceText = "本機瀏覽器"; } }
-      document.querySelectorAll("#yesterdayTable .prevQty").forEach(el => el.textContent = "昨日：-");
-      if(!previousRows.length){ if(hint) hint.textContent = `找不到 ${prevDate} ${store} 的前一天庫存紀錄。`; return; }
-      previousRows.forEach(item => { const row = [...document.querySelectorAll("#yesterdayTable tbody tr")].find(r => r.dataset.name === item.name); if(!row) return; const prevLabel = row.querySelector(".prevQty"); const noteText = item.note ? `（${item.note}）` : ""; if(prevLabel) prevLabel.textContent = `昨日：${item.qty || "-"}${noteText}`; });
-      if(hint) hint.textContent = `已顯示 ${prevDate} ${store} 的前一天數量（來源：${sourceText}）。`;
+async function loadPreviousDayStock(){
+  const store = document.getElementById("store").value;
+  const date = document.getElementById("date").value;
+  const hint = document.getElementById("previousHint");
+
+  if(!store || !date) return;
+
+  const prevDate = previousDateISO(date);
+  let previousRows = [];
+  let sourceText = "";
+
+  try {
+    const result = await apiPost("getPreviousStock", { store, date });
+
+    if(result && result.ok && Array.isArray(result.rows) && result.rows.length){
+      previousRows = result.rows;
+      sourceText = "Google Sheets";
     }
+  } catch(error) {
+    console.warn("Google Sheets 讀取失敗", error);
+  }
+
+  document.querySelectorAll("#yesterdayTable .prevQty").forEach(el => {
+    el.textContent = "昨日：-";
+  });
+
+  if(!previousRows.length){
+    if(hint) hint.textContent = `找不到 ${prevDate} ${store} 的前一天庫存紀錄。`;
+    return;
+  }
+
+  previousRows.forEach(item => {
+    const row = [...document.querySelectorAll("#yesterdayTable tbody tr")]
+      .find(r => r.dataset.name === item.name);
+
+    if(!row) return;
+
+    const prevLabel = row.querySelector(".prevQty");
+    const noteText = item.note ? `（${item.note}）` : "";
+
+    if(prevLabel) {
+      prevLabel.textContent = `昨日：${item.qty || "-"}${noteText}`;
+    }
+  });
+
+  if(hint) {
+    hint.textContent = `已顯示 ${prevDate} ${store} 的前一天數量（來源：${sourceText}）。`;
+  }
+}
 
     function collectSalesRows(){ return [...document.querySelectorAll("#salesTable tbody tr")].map(row => ({ name: row.dataset.name, unit: row.dataset.unit, qty: rowValue(row,".salesQty") })).filter(item => item.qty); }
     function collectExpiryRows(){ return [...document.querySelectorAll("#expiryTable tbody tr")].map(row => ({ name: rowValue(row,".expiryName"), dateText: rowValue(row,".expiryDate"), qty: rowValue(row,".expiryQty"), status: rowValue(row,".expiryStatus") })).filter(item => item.name && (item.dateText || item.qty || item.status !== "正常")); }
