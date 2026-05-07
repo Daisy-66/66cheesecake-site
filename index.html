@@ -104,6 +104,33 @@
 .collapsible.closed .sectionContent{ display:none; }
 
 @media (max-width:760px){
+  /* 基本資料對齊 */
+
+#store,
+#date,
+#time,
+#staff,
+#dailyRevenue,
+#totalRevenue{
+  width:100%;
+  height:44px !important;
+  min-height:44px !important;
+
+  padding:0 14px !important;
+
+  box-sizing:border-box;
+
+  border-radius:16px;
+
+  font-size:16px;
+}
+
+/* iPhone Safari select 高度修正 */
+
+select{
+  -webkit-appearance:none;
+  appearance:none;
+}
   /* ===== 手機版極簡模式 ===== */
 
 .hero{
@@ -139,11 +166,25 @@ label{
 input,
 select,
 textarea{
+
+  width:100%;
+
+  height:44px !important;
   min-height:44px !important;
-  height:44px;
-  padding:8px 12px !important;
+
+  padding:0 14px !important;
+
   font-size:16px;
+
   border-radius:14px;
+
+  box-sizing:border-box;
+
+  line-height:44px;
+}
+  select{
+  appearance:none;
+  -webkit-appearance:none;
 }
 
 textarea{
