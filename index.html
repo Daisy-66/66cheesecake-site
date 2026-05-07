@@ -460,7 +460,7 @@ padding: 6px 10px !important;
     <section class="card">
       <h2>① 基本資料</h2>
       <div class="grid">
-        <div><label>門市</label><select id="store" onchange="loadPreviousDayStock(); updateRevenueHint();"><option value="板橋大遠百">板橋大遠百</option><option value="林口三井Outlet">林口三井Outlet</option><option value="高雄漢神巨蛋">高雄漢神巨蛋</option><option value="台中大遠百">台中大遠百</option></select></div>
+        <div><label>門市</label><select id="store" onchange="changeStore(); loadPreviousDayStock(); updateRevenueHint();"><option value="板橋大遠百">板橋大遠百</option><option value="林口三井Outlet">林口三井Outlet</option><option value="高雄漢神巨蛋">高雄漢神巨蛋</option><option value="台中大遠百">台中大遠百</option></select></div>
         <div><label>盤點日期</label><input id="date" type="date" onchange="loadPreviousDayStock(); updateRevenueHint();" /></div>
         <div><label>盤點時間</label><input id="time" type="time" /></div>
         <div><label>填寫人</label><input id="staff" placeholder="例如：小美" /></div>
@@ -871,6 +871,7 @@ ${notes}` : "" ].filter(Boolean).join("\n");
     }
     function init(){ document.getElementById("date").value = todayISO(); document.getElementById("time").value = nowTime(); renderSales(); renderSimpleStock("yesterdayTable", stockItems, "yesterdayQty", "yesterdayNote", true); renderSimpleStock("incomingTable", incomingItems, "incomingQty", "incomingNote", false); renderSimpleStock("todayTable", stockItems, "todayQty", "todayNote", false); renderExpiryDefaults(); renderSupplies(); setupDiffListeners(); setTimeout(() => { loadPreviousDayStock(); updateRevenueHint(); }, 100); }
     init();
+    applyStoreFromUrl();
     loadDraft();
     // ===== 自動儲存草稿 =====
 
@@ -938,6 +939,23 @@ document.addEventListener("input", () => {
     el.innerHTML = el.innerHTML.replace("▶","▼");
   }
 
+}
+    function changeStore(){
+  const store = document.getElementById("store").value;
+
+  const url = new URL(window.location);
+  url.searchParams.set("store", store);
+  window.history.replaceState({}, "", url);
+}
+    function applyStoreFromUrl(){
+  const params = new URLSearchParams(window.location.search);
+  const store = params.get("store");
+  if(!store) return;
+
+  const storeSelect = document.getElementById("store");
+  if(storeSelect){
+    storeSelect.value = store;
+  }
 }
   </script>
 </body>
