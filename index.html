@@ -22,8 +22,28 @@
   gap:12px;
 }    .grid-2 { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
     label { display:block; font-size:13px; font-weight:700; color:var(--muted); margin-bottom:4px; }
-    input, select, textarea { width:100%; border:1px solid var(--line); border-radius:12px; padding:10px 12px; font-size:16px; background:#fffdfa; color:var(--text); outline:none; }
-    input:focus, select:focus, textarea:focus { border-color:var(--main); box-shadow:0 0 0 3px rgba(183,121,53,.14); }
+input,
+select,
+textarea{
+
+  width:100%;
+  max-width:100%;
+
+  height:40px !important;
+  min-height:40px !important;
+
+  padding:0 10px !important;
+
+  font-size:15px !important;
+
+  line-height:40px !important;
+
+  border-radius:14px;
+
+  box-sizing:border-box;
+
+  display:block;
+}    input:focus, select:focus, textarea:focus { border-color:var(--main); box-shadow:0 0 0 3px rgba(183,121,53,.14); }
     textarea { min-height:90px; resize:vertical; }
     table { width:100%; border-collapse:collapse; font-size:14px; }
     th, td { border-bottom:1px solid var(--line); padding:9px 6px; vertical-align:middle; }
@@ -104,6 +124,11 @@
 .collapsible.closed .sectionContent{ display:none; }
 
 @media (max-width:760px){
+
+  .grid > div,
+.grid-2 > div{
+  min-width:0;
+}
   /* 基本資料對齊 */
 
 #store,
