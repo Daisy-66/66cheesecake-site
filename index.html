@@ -976,9 +976,11 @@ document.addEventListener("input", () => {
   try { autoSaveDraft(); } catch(e) {}
 });
 
-    function toggleSection(el){
+function toggleSection(el){
 
   const section = el.closest(".collapsible");
+
+  if(!section) return;
 
   section.classList.toggle("closed");
 
