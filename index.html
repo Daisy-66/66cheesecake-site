@@ -724,34 +724,43 @@ function extractNumber(text){
         });
       }
 
-      if(Array.isArray(data.expiryRows)){
-        data.expiryRows.forEach(item => {
-          let row = [...document.querySelectorAll("#expiryTable tbody tr")]
-            .find(r => r.querySelector(".expiryName")?.value === item.name && !r.dataset.filledFromYesterday);
+     if(Array.isArray(data.expiryRows)){
 
-          if(!row){
-            addExpiryRow(item.name);
-            const rows = [...document.querySelectorAll("#expiryTable tbody tr")];
-            row = rows[rows.length - 1];
-          }
+  // 先清空效期品表格，避免留下空白列
+  const expiryTbody = document.querySelector("#expiryTable tbody");
+  expiryTbody.innerHTML = "";
 
-          row.dataset.filledFromYesterday = "true";
-          const el = row.querySelector(".prev");
-          if(el){
-            el.textContent = `昨日：${item.dateText || ""}${item.qty ? "*" + item.qty : ""}${item.status && item.status !== "正常" ? "（" + item.status + "）" : ""}`;
-            shownCount++;
-          }
+  data.expiryRows
+    .filter(item => item.name && (item.dateText || item.qty || item.status))
+    .forEach(item => {
 
-          const nameInput = row.querySelector(".expiryName");
-          if(nameInput && !nameInput.value) nameInput.value = item.name || "";
-          const dateInput = row.querySelector(".expiryDate");
-          if(dateInput && !dateInput.value) dateInput.value = item.dateText || "";
-          const qtyInput = row.querySelector(".expiryQty");
-          if(qtyInput && !qtyInput.value) qtyInput.value = item.qty || "";
-          const statusInput = row.querySelector(".expiryStatus");
-          if(statusInput && item.status) statusInput.value = item.status;
-        });
+      addExpiryRow(item.name);
+
+      const rows = [...document.querySelectorAll("#expiryTable tbody tr")];
+      const row = rows[rows.length - 1];
+
+      const el = row.querySelector(".prev");
+
+      if(el){
+        el.textContent =
+          `昨日：${item.dateText || ""}${item.qty ? "*" + item.qty : ""}${item.status && item.status !== "正常" ? "（" + item.status + "）" : ""}`;
+        shownCount++;
       }
+
+      const nameInput = row.querySelector(".expiryName");
+      if(nameInput) nameInput.value = item.name || "";
+
+      const dateInput = row.querySelector(".expiryDate");
+      if(dateInput) dateInput.value = item.dateText || "";
+
+      const qtyInput = row.querySelector(".expiryQty");
+      if(qtyInput) qtyInput.value = item.qty || "";
+
+      const statusInput = row.querySelector(".expiryStatus");
+      if(statusInput && item.status) statusInput.value = item.status;
+
+    });
+}
 
       if(Array.isArray(data.supplyRows)){
         data.supplyRows.forEach(item => {
