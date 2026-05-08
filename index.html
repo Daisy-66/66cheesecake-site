@@ -461,6 +461,19 @@ padding: 6px 10px !important;
         <div><label>盤點時間</label><input id="time" type="time" /></div>
         <div><label>填寫人</label><input id="staff" placeholder="例如：小美" /></div>
       </div>
+      <div style="margin-top:12px;">
+  <button
+    class="secondary"
+    type="button"
+    onclick="loadPreviousDayStock()"
+  >
+    顯示前一天數量
+  </button>
+
+  <p class="hint" id="previousHint">
+    尚未讀取前一天資料。
+  </p>
+</div>
       <p class="hint">資料會以「一筆盤點一列」寫入 Google Sheets 的 inventory 總表，老闆可用門市篩選或建立分頁檢視。</p>
     </section>
 
@@ -483,9 +496,7 @@ padding: 6px 10px !important;
     <section class="card collapsible closed">
       <h2 onclick="toggleSection(this)">▶ ④ 昨日剩餘「泡芙、迷你派」數</h2>
       <div class="sectionContent">
-       
-        <p class="hint" id="previousHint">尚未讀取前一天資料。</p>
-        <table id="yesterdayTable"><thead><tr><th>品項</th><th>數量</th><th>箱數 / 備註</th></tr></thead><tbody></tbody></table>
+               <table id="yesterdayTable"><thead><tr><th>品項</th><th>數量</th><th>箱數 / 備註</th></tr></thead><tbody></tbody></table>
       </div>
     </section>
 
@@ -539,7 +550,6 @@ padding: 6px 10px !important;
   <button class="toggleActions" type="button" onclick="toggleActions()">▲ 操作選單</button>
   <div class="actionButtons">
     <button class="primary" onclick="generateReport()">產生回報</button>
-    <button class="secondary"type="button"onclick="loadPreviousDayStock()">顯示前一天數量</button>
     <button class="secondary" onclick="saveCurrentDay()">儲存本日資料</button>
     <button class="secondary" onclick="copyReport()">一鍵複製</button>
     <button class="danger" onclick="clearForm()">清空本日資料</button>
