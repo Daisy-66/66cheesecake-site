@@ -437,8 +437,6 @@ padding: 6px 10px !important;
   font-weight:800;
   font-size:15px;
 }
-    oration:none;
-}
   </style>
 </head>
 
@@ -519,7 +517,8 @@ padding: 6px 10px !important;
     <section class="card collapsible closed">
       <h2 onclick="toggleSection(this)">▶ ⑧ 備品庫存</h2>
       <div class="sectionContent">
-        <table id="suppliesTable"><thead><tr><th>品項</th><th>前場</th><th>後場 / 箱子</th><th>狀態</th></tr></thead><tbody></tbody></table>
+        <table id="suppliesTable"><thead><tr><th>品項</th><th>前場</th><th>後場 / 箱子</th><th>狀態</th><th>操作</th></tr></thead><tbody></tbody></table>
+        <button class="secondary" type="button" onclick="addSupplyRow()">＋新增備品</button>
       </div>
     </section>
 
@@ -588,9 +587,42 @@ const expiryDefault = [
 
     function renderSales(){ const tbody = document.querySelector("#salesTable tbody"); tbody.innerHTML = salesItems.map(([name,unit]) => `<tr data-name="${name}" data-unit="${unit}"><td class="item-name" data-label="品項">${name}</td><td data-label="賣出數">${inputHTML("salesQty","0")}<div class="prev">昨日：-</div></td><td data-label="單位">${unit}</td></tr>`).join("\n"); }
     function renderSimpleStock(tableId, items, qtyClass, noteClass, showPrev=false){ const tbody = document.querySelector(`#${tableId} tbody`); tbody.innerHTML = items.map(name => `<tr data-name="${name}"><td class="item-name" data-label="品項">${name}</td><td data-label="數量">${inputHTML(qtyClass,"例如：3308顆 / 78包")}<div class="prev">昨日：-</div></td><td data-label="箱數 / 備註">${inputHTML(noteClass,"例如：10箱+0.5箱")}</td></tr>`).join("\n"); }
-    function renderSupplies(){ const tbody = document.querySelector("#suppliesTable tbody"); tbody.innerHTML = supplies.map(name => `<tr data-name="${name}"><td class="item-name" data-label="品項">${name}</td><td data-label="前場">${inputHTML("supplyFront","")}<div class="prev">昨日：-</div></td><td data-label="後場 / 箱子">${inputHTML("supplyBack","")}</td><td data-label="狀態">${statusSelect("supplyStatus")}</td></tr>`).join("\n"); }
-    function addExpiryRow(name=""){ const tbody = document.querySelector("#expiryTable tbody"); const tr = document.createElement("tr"); tr.innerHTML = `<td data-label="品項"><input class="expiryName" placeholder="品項" value="${name}" /></td><td data-label="效期"><input class="expiryDate" placeholder="例如：4/26-5/2" /></td><td data-label="數量"><input class="expiryQty" placeholder="例如：4包+3條" /><div class="prev">昨日：-</div></td><td data-label="狀態">${statusSelect("expiryStatus")}</td>`; tbody.appendChild(tr); }
-    function renderExpiryDefaults(){ expiryDefault.forEach(name => addExpiryRow(name)); }
+    function renderSupplies(){
+      const tbody = document.querySelector("#suppliesTable tbody");
+      tbody.innerHTML = "";
+      supplies.forEach(name => addSupplyRow(name));
+    }"><td class="item-name" data-label="品項">${name}</td><td data-label="前場">${inputHTML("supplyFront","")}<div class="prev">昨日：-</div></td><td data-label="後場 / 箱子">${inputHTML("supplyBack","")}</td><td data-label="狀態">${statusSelect("supplyStatus")}</td></tr>`).join("\n"); }
+    function addExpiryRow(name=""){
+      const tbody = document.querySelector("#expiryTable tbody");
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td data-label="品項"><input class="expiryName" placeholder="品項" value="${name}" /></td>
+        <td data-label="效期"><input class="expiryDate" placeholder="例如：4/26-5/2" /></td>
+        <td data-label="數量"><input class="expiryQty" placeholder="例如：4包+3條" /><div class="prev">昨日：-</div></td>
+        <td data-label="狀態">${statusSelect("expiryStatus")}</td>
+        <td data-label="操作"><button type="button" class="danger" onclick="deleteRow(this)">刪除</button></td>
+      `;
+      tbody.appendChild(tr);
+    }
+
+    function addSupplyRow(name=""){
+      const tbody = document.querySelector("#suppliesTable tbody");
+      const tr = document.createElement("tr");
+      tr.dataset.name = name;
+      tr.innerHTML = `
+        <td class="item-name" data-label="品項"><input class="supplyName" placeholder="備品名稱" value="${name}" /></td>
+        <td data-label="前場"><input class="supplyFront" placeholder="" /><div class="prev">昨日：-</div></td>
+        <td data-label="後場 / 箱子"><input class="supplyBack" placeholder="" /></td>
+        <td data-label="狀態">${statusSelect("supplyStatus")}</td>
+        <td data-label="操作"><button type="button" class="danger" onclick="deleteRow(this)">刪除</button></td>
+      `;
+      tbody.appendChild(tr);
+    }
+
+    function deleteRow(button){
+      const row = button.closest("tr");
+      if(row) row.remove();
+    }
 
     function apiJsonp(action, payload){ return new Promise((resolve,reject)=>{ const callbackName = `jsonp_${Date.now()}_${Math.floor(Math.random()*100000)}`; const params = new URLSearchParams({ action, callback:callbackName, ...payload }); const script = document.createElement("script"); script.src = `${GOOGLE_SCRIPT_URL}?${params.toString()}`; window[callbackName] = data => { delete window[callbackName]; script.remove(); resolve(data); }; script.onerror = () => { delete window[callbackName]; script.remove(); reject(new Error("JSONP request failed")); }; document.body.appendChild(script); }); }
     async function apiPost(action, payload){ if(action === "getPreviousStock" || action === "getMonthRevenue") return apiJsonp(action, payload); await fetch(GOOGLE_SCRIPT_URL,{ method:"POST", mode:"no-cors", headers:{"Content-Type":"text/plain;charset=utf-8"}, body:JSON.stringify({ action, ...payload }) }); return { ok:true, opaque:true }; }
@@ -764,7 +796,8 @@ function extractNumber(text){
 
       if(Array.isArray(data.supplyRows)){
         data.supplyRows.forEach(item => {
-          const row = document.querySelector(`#suppliesTable tr[data-name="${item.name}"]`);
+          const row = [...document.querySelectorAll("#suppliesTable tbody tr")]
+            .find(r => (r.dataset.name || r.querySelector(".supplyName")?.value) === item.name);
           if(!row) return;
           const el = row.querySelector(".prev");
           const parts = [];
@@ -789,7 +822,16 @@ function extractNumber(text){
 
     function collectSalesRows(){ return [...document.querySelectorAll("#salesTable tbody tr")].map(row => ({ name: row.dataset.name, unit: row.dataset.unit, qty: rowValue(row,".salesQty") })).filter(item => item.qty); }
     function collectExpiryRows(){ return [...document.querySelectorAll("#expiryTable tbody tr")].map(row => ({ name: rowValue(row,".expiryName"), dateText: rowValue(row,".expiryDate"), qty: rowValue(row,".expiryQty"), status: rowValue(row,".expiryStatus") })).filter(item => item.name && (item.dateText || item.qty || item.status !== "正常")); }
-    function collectSupplyRows(){ return [...document.querySelectorAll("#suppliesTable tbody tr")].map(row => ({ name: row.dataset.name, front: rowValue(row,".supplyFront"), back: rowValue(row,".supplyBack"), status: rowValue(row,".supplyStatus") })).filter(item => item.front || item.back || item.status !== "正常"); }
+    function collectSupplyRows(){
+      return [...document.querySelectorAll("#suppliesTable tbody tr")]
+        .map(row => ({
+          name: row.dataset.name || rowValue(row,".supplyName"),
+          front: rowValue(row,".supplyFront"),
+          back: rowValue(row,".supplyBack"),
+          status: rowValue(row,".supplyStatus")
+        }))
+        .filter(item => item.name && (item.front || item.back || item.status !== "正常"));
+    })).filter(item => item.front || item.back || item.status !== "正常"); }
 
     function generateReport(){ const store = document.getElementById("store").value; const date = document.getElementById("date").value; const time = document.getElementById("time").value; const staff = document.getElementById("staff").value.trim(); const notes = document.getElementById("notes").value.trim(); const dailyRevenue = document.getElementById("dailyRevenue").value.trim(); const totalRevenue = document.getElementById("totalRevenue").value.trim(); const header = `${formatDate(date)}${time ? time.replace(":","點") : ""}${store}庫存${staff ? `｜填寫：${staff}` : ""}`;
       const revenueLines = []; if(dailyRevenue) revenueLines.push(`當日業績${money(dailyRevenue)}`); if(totalRevenue) revenueLines.push(`總營業額${money(totalRevenue)}`);
