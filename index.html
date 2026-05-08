@@ -879,9 +879,9 @@ ${notes}` : "" ].filter(Boolean).join("\n");
       });
     }
     function init(){ document.getElementById("date").value = todayISO(); document.getElementById("time").value = nowTime(); renderSales(); renderSimpleStock("yesterdayTable", stockItems, "yesterdayQty", "yesterdayNote", true); renderSimpleStock("incomingTable", incomingItems, "incomingQty", "incomingNote", false); renderSimpleStock("todayTable", stockItems, "todayQty", "todayNote", false); renderExpiryDefaults(); renderSupplies(); setupDiffListeners(); setTimeout(() => { loadPreviousDayStock(); updateRevenueHint(); }, 100); }
-    init();
-    applyStoreFromUrl();
-    loadDraft();
+init();
+loadDraft();
+applyStoreFromUrl();
     // ===== 自動儲存草稿 =====
 
 function autoSaveDraft(){
